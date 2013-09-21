@@ -123,6 +123,7 @@ class RabbitSystem(GameSystem):
         rotation = atan2(YDistance, XDistance)
         body = rabbit['cymunk-physics']['body']
         body.angle = (rotation) - pi
+        body.angular_velocity = 0
         unit_vector = body.rotation_vector
         force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
         force = 1000*unit_vector[0], 1000*unit_vector[1]
@@ -270,7 +271,6 @@ class DarkBunnyGame(Widget):
         Clock.schedule_once(self.setup_hawk)
         Clock.schedule_once(self.setup_stuff)
 
-
     def setup_hawk(self, dt):
         hawk_ai_system = self.gameworld.systems['hawk_ai_system']
         hawk_ai_system.spawn_hawk((500, 500))
@@ -305,9 +305,33 @@ class DarkBunnyGame(Widget):
     def set_state(self):
         self.gameworld.state = 'main'
 
+    def add_boundary(self, width, height, position):
+        shape_dict = {'width': width, 'height': height, 'mass': 0}
+        col_shape_dict = {'shape_type': 'box', 'elasticity': .5,
+                          'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
+        physics_component_dict = {'main_shape': 'box', 'velocity': (0, 0), 'position': position, 'angle':0, 'angular_velocity': 0,
+                                  'mass': 0, 'vel_limit': 1000, 'ang_vel_limit': math.radians(1000), 'col_shapes': [col_shape_dict]}
+        create_component_dict = {'cymunk-physics': physics_component_dict,
+                                 'physics_renderer': {'texture': '', 'size': (width, height)}}
+        component_order = ['cymunk-physics']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def add_boundaries(self):
+        gamescreen_width = self.size[0]
+        gamescreen_height = self.size[1]
+        ##left bounding box
+        self.add_boundary(gamescreen_height, 1, (0, gamescreen_height/2))
+        #bottom bounding box
+        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, 0))
+        #right bounding box
+        self.add_boundary(gamescreen_height, 1, (gamescreen_width, gamescreen_height/2))
+        #top bounding box
+        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, gamescreen_height))
+
     def setup_stuff(self, dt):
         self.add_rabbit()
         self.add_hole()
+        self.add_boundaries()
 
 
 class DebugPanel(Widget):
