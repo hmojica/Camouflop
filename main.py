@@ -41,4 +41,5 @@ class DarkApp(App):
     def build(self):
     	pass
 
-if __name__== '__main__': DarkApp().run()
+if __name__== '__main__':
+    DarkApp().run()
