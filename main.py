@@ -46,7 +46,7 @@ class RabbitSystem(GameSystem):
         rabbit_system = {''}
         animation_state_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
         '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4': 
-        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .15, 'current_frame': 0,
+        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
         'current_frame_time': 0., 'number_of_frames': 6}
         animation_system = {'states': {'running': animation_state_dict}, 'current_state': 'running'}
         create_component_dict = {'cymunk-physics': physics_component, 
