@@ -13,9 +13,9 @@ class HawkAISystem(GameSystem):
 
     flyover_positions = [
         [-50, -50],
-        [400, 400]]
-    # [-2000, -2000]
-    # [5000, 5000]
+        [600, 600],
+        [0, 300],
+        [600, 100]]
 
     def remove_entity(self, entity_id):
         super(HawkAISystem, self).remove_entity(entity_id)
@@ -109,9 +109,6 @@ class HawkAISystem(GameSystem):
         # else:
         #     ship_data['fire_engines'] = False
         #     entity_engine_effect['particle_system_on'] = False
-
-    # [-2000, -2000]
-    # [5000, 5000]
 
     def update(self, dt):
         if self.cycle_count < self.cycles_to_skip:
