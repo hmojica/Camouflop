@@ -14,6 +14,30 @@ from kivy.core.image import Image as CoreImage
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
+    white_rabbits = []
+
+    def __init__(self, **kwargs):
+        super(RabbitSystem, self).__init__(**kwargs)
+        self.setup_rabbit_dicts()
+
+    def setup_rabbit_dicts(self):
+        self.rabbit_dicts = rabbit_dicts = {}
+        dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+        white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+        white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
+        '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4': 
+        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+        'current_frame_time': 0., 'number_of_frames': 6}
+        black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
+        '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4': 
+        'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
+        'current_frame_time': 0., 'number_of_frames': 6}
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 20, 'mass': 50, 'x': 100, 'y': 100,
+                                      'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer, 
+                                      'anim_state': black_rabbit_anim_dict}
+        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': 100, 'y': 400,
+                                        'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
+                                        'anim_state': white_rabbit_anim_dict}
 
     def rabbit_collide_with_hole(self, space, arbiter):
         gameworld = self.gameworld
@@ -25,53 +49,130 @@ class RabbitSystem(GameSystem):
         rabbit_position = rabbit_entity['cymunk-physics']['position']
         hole_position = hole_entity['cymunk-physics']['position']
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
-        self.rabbit = None
+        if self.rabbit == rabbit_id:
+            self.rabbit = None
+        elif rabbit_id in self.white_rabbits:
+            self.white_rabbits.remove(rabbit_id)
         return False
 
-    def add_rabbit(self):
-        x = 100
-        y = 100
-        shape_dict = {'inner_radius': 0, 'outer_radius': 32, 
-        'mass': 50, 'offset': (0, 0)}
+    def no_impact_collision(self, space, arbiter):
+        return False
+
+    def collide_white_rabbit_and_halo(self, space, arbiter):
+        rabbit_id = arbiter.shapes[0].body.data
+        if rabbit_id == self.rabbit:
+            return False
+        rabbit_entity = self.gameworld.entities[rabbit_id]
+        self.stop_rabbit(rabbit_entity)
+        return False
+
+
+    def add_rabbit(self, rabbit_type):
+        rabbit_info = self.rabbit_dicts[rabbit_type]
+        x = rabbit_info['x']
+        y = rabbit_info['y']
+        shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'],
+            'mass': rabbit_info['mass'], 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5, 
         'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
+        if rabbit_type == 'dark_bunny':
+            charisma_halo_shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'] + 20,
+            'mass': rabbit_info['mass'], 'offset': (0, 0)}
+            charisma_halo = dict(shape_type='circle', elasticity=.5, collision_type=10,
+                                 shape_info=charisma_halo_shape_dict, friction=1.0)
+            col_shapes.append(charisma_halo)
         physics_component = {'main_shape': 'circle', 
         'velocity': (0, 0), 
-        'position': (x, y), 'angle': 0, 
+        'position': (x, y), 'angle': rabbit_info['angle'],
         'angular_velocity': 0, 
-        'vel_limit': 250, 
+        'vel_limit': rabbit_info['vel_limit'],
         'ang_vel_limit': radians(200), 
         'mass': 50, 'col_shapes': col_shapes}
-        rabbit_system = {''}
-        animation_state_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
-        '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4': 
-        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
-        'current_frame_time': 0., 'number_of_frames': 6}
-        animation_system = {'states': {'running': animation_state_dict}, 'current_state': 'running'}
+        animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
+        component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
+        rabbit_system = {'rabbit_type': rabbit_type}
         create_component_dict = {'cymunk-physics': physics_component, 
-        'physics_renderer': {'texture': 
-            'assets/white_rabbit/WR1.png', 'size': (53, 57)},
+        'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system, 
         'animation_system': animation_system}
-        component_order = ['cymunk-physics', 'physics_renderer', 'animation_system']
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
-        self.rabbit = entity_id
+        if rabbit_type == 'dark_bunny':
+            self.rabbit = entity_id
+        else:
+            self.white_rabbits.append(entity_id)
 
     def on_touch_down(self, touch):
-        if self.rabbit != None:
+        called_rabbit = self.touch_rabbit(touch)
+        if not called_rabbit is None:
+            if called_rabbit == self.rabbit:
+                self.stop_rabbit(self.gameworld.entities[called_rabbit])
+            else:
+                self.call_rabbit(called_rabbit)
+        elif self.rabbit is not None:
             rabbit = self.gameworld.entities[self.rabbit]
             rabbit_position = rabbit['cymunk-physics']['position']
             XDistance =  (rabbit_position[0]) - touch.x
             YDistance =  (rabbit_position[1]) - touch.y
-            rotation = atan2(YDistance, XDistance) 
-            body = rabbit['cymunk-physics']['body']
-            body.reset_forces()
-            body.velocity = (0, 0)
-            body.angle = (rotation) - pi
-            unit_vector = body.rotation_vector
-            force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
-            force = 1000*unit_vector[0], 1000*unit_vector[1]
-            body.apply_force(force, force_offset)
+            self.apply_rabbit_force(rabbit, XDistance, YDistance)
+
+    def apply_rabbit_force(self, rabbit, XDistance, YDistance):
+        self.stop_rabbit(rabbit)
+        rotation = atan2(YDistance, XDistance)
+        body = rabbit['cymunk-physics']['body']
+        body.angle = (rotation) - pi
+        unit_vector = body.rotation_vector
+        force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
+        force = 1000*unit_vector[0], 1000*unit_vector[1]
+        body.apply_force(force, force_offset)
+
+    def stop_rabbit(self, rabbit_entity):
+        body = rabbit_entity['cymunk-physics']['body']
+        body.reset_forces()
+        body.velocity = (0, 0)
+
+    def call_rabbit(self, rabbit_id):
+        rabbit = self.gameworld.entities[rabbit_id]
+        black_rabbit = self.gameworld.entities[self.rabbit]
+        black_rabbit_position = black_rabbit['cymunk-physics']['position']
+        white_rabbit_position = rabbit['cymunk-physics']['position']
+        XDistance = (white_rabbit_position[0]) - (black_rabbit_position[0])
+        YDistance = (white_rabbit_position[1]) - (black_rabbit_position[1])
+        self.apply_rabbit_force(rabbit, XDistance, YDistance)
+
+    def calculate_desired_vector(self, target, location, ship_data, ship_ai_data):
+        g_map = self.gameworld.systems['default_map']
+        map_size_x = g_map.map_size[0]/1.9
+        map_size_y = g_map.map_size[1]/1.9
+        dist_x = math.fabs(target[0] - location[0])
+        dist_y = math.fabs(target[1] - location[1])
+        ship_ai_data['distance_to_target'] = Vector(target).distance2(location)
+        max_speed = ship_data['max_speed']
+        v = Vector(target) - Vector(location)
+        v = v.normalize()
+        v *= max_speed
+        if ship_ai_data['ai_state'] == 'flee':
+            v *= -1
+        if dist_x > map_size_x:
+            v[0] *=-1
+        if dist_y > map_size_y:
+            v[1] *=-1
+        return v
+
+    def touch_rabbit(self, touch):
+        touch_square = self.query_physics_bb((touch.x,touch.y),5)
+        nonplayer_rabbits = self.white_rabbits
+        for entity_id in touch_square:
+            if entity_id == self.rabbit:
+                return entity_id
+            if entity_id in nonplayer_rabbits:
+                return entity_id
+        return None
+
+    def query_physics_bb(self, position, radius):
+        physics_system = self.gameworld.systems['cymunk-physics']
+        bb_list = [position[0] - radius, position[1] - radius, position[0] + radius, position[1] + radius]
+        in_radius = physics_system.query_bb(bb_list)
+        return in_radius
 
 class AnimationSystem(GameSystem):
     '''
@@ -102,7 +203,7 @@ class AnimationSystem(GameSystem):
         for entity_id in self.entity_ids:
             entity = entities[entity_id]
             animation_system = entity[system_id]
-            rendering_system = entity[rendering_system]
+            r_rendering_system = entity[rendering_system]
             current_state = animation_system['current_state']
             state_dict = animation_system['states'][current_state]
             state_dict['current_frame_time'] += dt
@@ -112,8 +213,8 @@ class AnimationSystem(GameSystem):
                 if state_dict['current_frame'] >= state_dict['number_of_frames']:
                     state_dict['current_frame'] = 0
                 texture_str = state_dict[str(state_dict['current_frame'])]
-                rendering_system['quad'].texture = load_texture(texture_str)
-                rendering_system['texture'] = texture_str
+                r_rendering_system['quad'].texture = load_texture(texture_str)
+                r_rendering_system['texture'] = texture_str
 
 
 
@@ -159,13 +260,15 @@ class DarkBunnyGame(Widget):
     def add_rabbit(self):
         systems = self.gameworld.systems
         rabbit_system = systems['rabbit_system']
-        rabbit_system.add_rabbit()
+        rabbit_system.add_rabbit('dark_bunny')
+        rabbit_system.add_rabbit('white_rabbit_1')
 
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
         self.set_state()
         self.setup_collision_callbacks()
+
         Clock.schedule_interval(self.update, 1./60.)
         Clock.schedule_once(self.setup_stuff)
 
@@ -188,6 +291,8 @@ class DarkBunnyGame(Widget):
         rabbit_system = systems['rabbit_system']
         physics.add_collision_handler(1, 2, 
             begin_func=rabbit_system.rabbit_collide_with_hole)
+        physics.add_collision_handler(10, 2, begin_func=rabbit_system.no_impact_collision)
+        physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
 
     def set_state(self):
         self.gameworld.state = 'main'
