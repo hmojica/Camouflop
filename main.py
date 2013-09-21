@@ -14,6 +14,19 @@ class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
 
+    def __init__(self, **kwargs):
+        super(RabbitSystem, self).__init__(**kwargs)
+        self.setup_rabbit_dicts()
+
+    def setup_rabbit_dicts(self):
+        self.rabbit_dicts = rabbit_dicts = {}
+        dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+        white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 32, 'mass': 50, 'x': 100, 'y': 100,
+                                      'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer}
+        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 32, 'mass': 50, 'x': 100, 'y': 400,
+                                        'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer}
+
     def rabbit_collide_with_hole(self, space, arbiter):
         gameworld = self.gameworld
         entities = gameworld.entities
@@ -27,28 +40,29 @@ class RabbitSystem(GameSystem):
         self.rabbit = None
         return False
 
-    def add_rabbit(self):
-        x = 100
-        y = 100
-        shape_dict = {'inner_radius': 0, 'outer_radius': 32, 
-        'mass': 50, 'offset': (0, 0)}
+    def add_rabbit(self, rabbit_type):
+        rabbit_info = self.rabbit_dicts[rabbit_type]
+        x = rabbit_info['x']
+        y = rabbit_info['y']
+        shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'],
+            'mass': rabbit_info['mass'], 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5, 
         'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
         physics_component = {'main_shape': 'circle', 
         'velocity': (0, 0), 
-        'position': (x, y), 'angle': 0, 
+        'position': (x, y), 'angle': rabbit_info['angle'],
         'angular_velocity': 0, 
-        'vel_limit': 250, 
+        'vel_limit': rabbit_info['vel_limit'],
         'ang_vel_limit': radians(200), 
         'mass': 50, 'col_shapes': col_shapes}
         rabbit_system = {''}
         create_component_dict = {'cymunk-physics': physics_component, 
-        'physics_renderer': {'texture': 
-            'rabbit.png', 'size': (64, 64)},}
+        'physics_renderer': rabbit_info['physics_renderer'],}
         component_order = ['cymunk-physics', 'physics_renderer']
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
-        self.rabbit = entity_id
+        if rabbit_type == 'dark_bunny':
+            self.rabbit = entity_id
 
     def on_touch_down(self, touch):
         if self.rabbit != None:
@@ -103,7 +117,8 @@ class DarkBunnyGame(Widget):
     def add_rabbit(self):
         systems = self.gameworld.systems
         rabbit_system = systems['rabbit_system']
-        rabbit_system.add_rabbit()
+        rabbit_system.add_rabbit('dark_bunny')
+        rabbit_system.add_rabbit('white_rabbit_1')
 
     def init_game(self, dt):
         self.setup_states()
