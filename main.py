@@ -1,4 +1,5 @@
 import kivy
+import hawk
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.widget import Widget
@@ -7,6 +8,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi
 from functools import partial
+from random import randint
 
 class DarkBunnyGame(Widget):
     rabbit = NumericProperty(None, allownone=True)
@@ -99,6 +101,11 @@ class DarkBunnyGame(Widget):
         self.add_rabbit()
         self.add_hole()
         Clock.schedule_interval(self.update, 1./60.)
+        Clock.schedule_once(self.setup_hawk)
+
+    def setup_hawk(self, dt):
+        hawk_ai_system = self.gameworld.systems['hawk_ai_system']
+        hawk_ai_system.spawn_hawk((500, 500))
 
     def setup_map(self):
         self.gameworld.currentmap = self.gameworld.systems['map']
@@ -108,7 +115,7 @@ class DarkBunnyGame(Widget):
 
     def setup_states(self):
         self.gameworld.add_state(state_name='main', systems_added=[
-            'physics_renderer2', 'physics_renderer'], 
+            'physics_renderer2', 'physics_renderer', 'hawk_physics_renderer'],
             systems_removed=[], 
             systems_paused=[], systems_unpaused=[],
             screenmanager_screen='main')
