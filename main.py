@@ -240,7 +240,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'shadow_renderer': {'texture':
-            'hole.png', 'size': (80, 80)},}
+            'treeshadow.png', 'size': (200, 200)},}
         component_order = ['cymunk-physics', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
@@ -248,7 +248,7 @@ class EnvironmentSystem(GameSystem):
         x = position[0]
         y = position[1]
         shape_dict = {'inner_radius': 0, 'outer_radius': 10,
-        'mass': 0, 'offset': (0, 0)}
+        'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
@@ -264,6 +264,7 @@ class EnvironmentSystem(GameSystem):
             'green_snow_tree.png', 'size': (80, 80)},}
         component_order = ['cymunk-physics', 'tree_physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
+
 
 
 class DarkBunnyGame(Widget):
@@ -311,7 +312,7 @@ class DarkBunnyGame(Widget):
         environment_system = systems['environment_system']
         tree_position = (300, 150)
         environment_system.add_tree(tree_position)
-      #  environment_system.add_tree_shadow(tree_position)
+        environment_system.add_tree_shadow(tree_position)
 
 
     def init_game(self, dt):
@@ -337,7 +338,7 @@ class DarkBunnyGame(Widget):
 
     def setup_states(self):
         self.gameworld.add_state(state_name='main', systems_added=[
-            'physics_renderer2', 'physics_renderer', 'hawk_physics_renderer'],
+            'physics_renderer2', 'physics_renderer',  'tree_physics_renderer', 'hawk_physics_renderer'],
             systems_removed=[], 
             systems_paused=[], systems_unpaused=[],
             screenmanager_screen='main')

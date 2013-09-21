@@ -31,15 +31,18 @@ DarkBunnyGame:
 			damping: .9
 		PhysicsRenderer:
 			gameworld: root.gameworld
-			system_id: 'physics_renderer2'
-	    PhysicsRenderer:
+			system_id: 'shadow_renderer'
+		PhysicsRenderer:
 			gameworld: root.gameworld
-			system_id: 'tree_physics_renderer'
+			system_id: 'physics_renderer2'
 	    PhysicsRenderer:
 	        gameworld: root.gameworld
 	        system_id: 'hawk_physics_renderer'
 		PhysicsRenderer:
 			gameworld: root.gameworld
+		PhysicsRenderer:
+			gameworld: root.gameworld
+			system_id: 'tree_physics_renderer'
 	    HawkAISystem:
 	        id: hawk_ai_system
 			system_id: 'hawk_ai_system'
