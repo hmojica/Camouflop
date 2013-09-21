@@ -110,14 +110,10 @@ class RabbitSystem(GameSystem):
         return False
 
     def collide_rabbit_and_boundary(self, space, arbiter):
-        print 'collide'
         gameworld = self.gameworld
         entities = gameworld.entities
-        # boundary_id = arbiter.shapes[0].body.data
         rabbit_id = arbiter.shapes[0].body.data
-        print rabbit_id
         rabbit_entity = entities[rabbit_id]
-        print rabbit_entity
         rabbit_body = rabbit_entity['cymunk-physics']['body']
         rabbit_body.reset_forces()
         rabbit_body.velocity = (0, 0)
