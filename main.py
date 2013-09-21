@@ -7,6 +7,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi
 from functools import partial
+from kivy.vector import Vector
 
 class DarkBunnyGame(Widget):
     rabbit = NumericProperty(None, allownone=True)
@@ -26,10 +27,16 @@ class DarkBunnyGame(Widget):
         entities = gameworld.entities
         rabbit_id = arbiter.shapes[0].body.data
         hole_id = arbiter.shapes[1].body.data
+        rabbit_entity = entities[rabbit_id]
+        hole_entity = entities[hole_id]
+        rabbit_position = rabbit_entity['cymunk-physics']['position']
+        hole_position = hole_entity['cymunk-physics']['position']
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
         self.rabbit = None
-        print rabbit_id, hole_id
         return False
+
+        
+
 
     def on_touch_down(self, touch):
         print self.rabbit
@@ -73,7 +80,7 @@ class DarkBunnyGame(Widget):
     def add_hole(self):
         x = 500
         y = 100
-        shape_dict = {'inner_radius': 0, 'outer_radius': 40, 
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10, 
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5, 
         'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
