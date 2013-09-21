@@ -9,6 +9,7 @@ from kivy.core.window import Window
 from math import radians, atan2, degrees, pi
 from functools import partial
 from kivy.vector import Vector
+from kivy.core.image import Image as CoreImage
 
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
@@ -23,10 +24,20 @@ class RabbitSystem(GameSystem):
         self.rabbit_dicts = rabbit_dicts = {}
         dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
         white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-        rabbit_dicts['dark_bunny'] = {'outer_radius': 32, 'mass': 50, 'x': 100, 'y': 100,
-                                      'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer}
-        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 32, 'mass': 50, 'x': 100, 'y': 400,
-                                        'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer}
+        white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
+        '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4': 
+        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+        'current_frame_time': 0., 'number_of_frames': 6}
+        black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
+        '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4': 
+        'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
+        'current_frame_time': 0., 'number_of_frames': 6}
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 20, 'mass': 50, 'x': 100, 'y': 100,
+                                      'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer, 
+                                      'anim_state': black_rabbit_anim_dict}
+        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': 100, 'y': 400,
+                                        'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
+                                        'anim_state': white_rabbit_anim_dict}
 
     def rabbit_collide_with_hole(self, space, arbiter):
         gameworld = self.gameworld
@@ -78,10 +89,12 @@ class RabbitSystem(GameSystem):
         'vel_limit': rabbit_info['vel_limit'],
         'ang_vel_limit': radians(200), 
         'mass': 50, 'col_shapes': col_shapes}
+        animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
+        component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
         rabbit_system = {'rabbit_type': rabbit_type}
         create_component_dict = {'cymunk-physics': physics_component, 
-        'physics_renderer': rabbit_info['physics_renderer'],}
-        component_order = ['cymunk-physics', 'physics_renderer']
+        'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system, 
+        'animation_system': animation_system}
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
         if rabbit_type == 'dark_bunny':
             self.rabbit = entity_id
@@ -160,6 +173,55 @@ class RabbitSystem(GameSystem):
         bb_list = [position[0] - radius, position[1] - radius, position[0] + radius, position[1] + radius]
         in_radius = physics_system.query_bb(bb_list)
         return in_radius
+
+class AnimationSystem(GameSystem):
+    '''
+    Animation component info looks like: {'states': {dict of state_name, state dicts, 'current_state': state_name}
+    state dict looks like: 'number_of_frames': integer, 'frame': 'graphic_str', 
+    'current_frame_time': float, 'time_between_frames': float, 'current_frame': int}
+    '''
+    renderer_to_modify = StringProperty('physics_renderer')
+    system_id = StringProperty('animation_system')
+    
+    def __init__(self, **kwargs):
+        super(AnimationSystem, self).__init__(**kwargs)
+        self.textures = {}
+
+    def load_texture(self, texture_str):
+        textures = self.textures
+        if texture_str not in textures:
+            textures[texture_str] = CoreImage(texture_str).texture
+        texture = textures[texture_str]
+        return texture
+
+    def update(self, dt):
+        gameworld = self.gameworld
+        entities = gameworld.entities
+        system_id = self.system_id
+        rendering_system = self.renderer_to_modify
+        load_texture = self.load_texture
+        for entity_id in self.entity_ids:
+            entity = entities[entity_id]
+            animation_system = entity[system_id]
+            r_rendering_system = entity[rendering_system]
+            current_state = animation_system['current_state']
+            state_dict = animation_system['states'][current_state]
+            state_dict['current_frame_time'] += dt
+            if state_dict['current_frame_time'] >= state_dict['time_between_frames']:
+                state_dict['current_frame_time'] -= state_dict['time_between_frames']
+                state_dict['current_frame'] += 1
+                if state_dict['current_frame'] >= state_dict['number_of_frames']:
+                    state_dict['current_frame'] = 0
+                texture_str = state_dict[str(state_dict['current_frame'])]
+                r_rendering_system['quad'].texture = load_texture(texture_str)
+                r_rendering_system['texture'] = texture_str
+
+
+
+
+
+
+
 
 class DarkBunnyGame(Widget):
     
