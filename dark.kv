@@ -6,6 +6,12 @@ DarkBunnyGame:
 	gameworld: gameworld
 	pos: root.pos
 	size: root.size
+	canvas:
+		Color
+			rgba: (1., 1., 1., 1.)
+		Rectangle:
+			size: self.size
+			pos: self.pos
 	GameWorld:
 		id: gameworld
 		gamescreenmanager: gamescreenmanager
@@ -14,6 +20,7 @@ DarkBunnyGame:
 			size: root.size
 			pos: root.pos
 			gameworld: root.gameworld
+
 
 <GameScreenManager>:
 	MainScreen:
@@ -34,5 +41,5 @@ DarkBunnyGame:
         size: root.size
         halign: 'center'
         valign: 'middle'
-        color: (1,1,1,1)
+        color: (0., 0., 0., 1.)
         text: 'FPS: ' + root.fps if root.fps != None else 'FPS:'

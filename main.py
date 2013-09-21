@@ -4,6 +4,7 @@ from kivy.properties import StringProperty
 from kivy.uix.widget import Widget
 import kivent_cython
 from kivy.clock import Clock
+from kivy.core.window import Window
 
 class DarkBunnyGame(Widget):
 
@@ -38,6 +39,6 @@ class DebugPanel(Widget):
 class DarkApp(App):
 
     def build(self):
-        pass
+    	pass
 
 if __name__== '__main__': DarkApp().run()
