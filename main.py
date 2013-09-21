@@ -24,6 +24,22 @@ class RabbitSystem(GameSystem):
         super(RabbitSystem, self).__init__(**kwargs)
         self.setup_rabbit_dicts()
 
+    def update(self, dt):
+        for entity_id in self.entity_ids:
+            rabbit_entity = self.gameworld.entities[entity_id]
+            if rabbit_entity['rabbit_system']['is_safe']:
+                self.change_visibility(entity_id, -1)
+            else:
+                self.change_visibility(entity_id, 2)
+
+
+    def change_visibility(self, rabbit_id, amount):
+        entities = self.gameworld.entities
+        rabbit_entity = entities[rabbit_id]
+        rabbit_visibility = rabbit_entity['rabbit_system']['visibility']
+        rabbit_visibility = rabbit_visibility + amount
+        rabbit_entity['rabbit_system']['visibility'] = rabbit_visibility
+
     def setup_rabbit_dicts(self):
         self.rabbit_dicts = rabbit_dicts = {}
         dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
@@ -59,7 +75,30 @@ class RabbitSystem(GameSystem):
             self.white_rabbits.remove(rabbit_id)
         return False
 
-    def no_impact_collision(self, space, arbiter):
+    def enter_shadow(self, space, arbiter):
+        rabbit_id = arbiter.shapes[0].body.data
+        rabbit_entity = self.gameworld.entities[rabbit_id]
+        rabbit_entity['rabbit_system']['shadow_count'] += 1
+        is_black = rabbit_id == self.rabbit
+        self.update_is_safe(rabbit_entity, is_black)
+        return False
+
+    def update_is_safe(self, rabbit_entity, is_black):
+        rabbit_system = rabbit_entity['rabbit_system']
+        has_camouflage = (rabbit_system['shadow_count'] > 0 and is_black) \
+            or (rabbit_system['shadow_count'] == 0 and not is_black)
+        if has_camouflage:
+            rabbit_system['is_safe'] = True
+        elif not rabbit_system['in_log']:
+            rabbit_system['is_safe'] = False
+
+
+    def leave_shadow(self, space, arbiter):
+        rabbit_id = arbiter.shapes[0].body.data
+        rabbit_entity = self.gameworld.entities[rabbit_id]
+        rabbit_entity['rabbit_system']['shadow_count'] -= 1
+        is_black = rabbit_id == self.rabbit
+        self.update_is_safe(rabbit_entity, is_black)
         return False
 
     def collide_white_rabbit_and_halo(self, space, arbiter):
@@ -75,13 +114,15 @@ class RabbitSystem(GameSystem):
         gameworld = self.gameworld
         entities = gameworld.entities
         # boundary_id = arbiter.shapes[0].body.data
-        rabbit_id = arbiter.shapes[1].body.data
+        rabbit_id = arbiter.shapes[0].body.data
+        print rabbit_id
         rabbit_entity = entities[rabbit_id]
+        print rabbit_entity
         rabbit_body = rabbit_entity['cymunk-physics']['body']
         rabbit_body.reset_forces()
         rabbit_body.velocity = (0, 0)
         rabbit_body.angular_velocity = (0, 0)
-        return False
+        return True
 
     def add_rabbit(self, rabbit_type):
         rabbit_info = self.rabbit_dicts[rabbit_type]
@@ -107,7 +148,8 @@ class RabbitSystem(GameSystem):
         'mass': 50, 'col_shapes': col_shapes}
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
-        rabbit_system = {'rabbit_type': rabbit_type}
+        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': False, 'in_log': False,
+                         'shadow_count': 0}
         create_component_dict = {'cymunk-physics': physics_component, 
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system, 
         'animation_system': animation_system}
@@ -234,6 +276,53 @@ class AnimationSystem(GameSystem):
                 r_rendering_system['texture'] = texture_str
 
 
+class EnvironmentSystem(GameSystem):
+    system_id = StringProperty('environment_system')
+
+    def add_tree_shadow(self, position):
+        x = position[0]
+        y = position[1]
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': (x, y), 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 0,
+        'ang_vel_limit': 0,
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'shadow_renderer': {'texture':
+            'treeshadow.png', 'size': (200, 200)},}
+        component_order = ['cymunk-physics', 'shadow_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def add_tree(self, position):
+        x = position[0]
+        y = position[1]
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': (x, y), 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 0,
+        'ang_vel_limit': 0,
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'tree_physics_renderer': {'texture':
+            'green_snow_tree.png', 'size': (80, 80)},}
+        component_order = ['cymunk-physics', 'tree_physics_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+
+
 class DarkBunnyGame(Widget):
     
     def __init__(self, **kwargs):
@@ -274,11 +363,19 @@ class DarkBunnyGame(Widget):
         rabbit_system.add_rabbit('dark_bunny')
         rabbit_system.add_rabbit('white_rabbit_1')
 
+    def add_environment(self):
+        systems = self.gameworld.systems
+        environment_system = systems['environment_system']
+        tree_position = (300, 150)
+        environment_system.add_tree(tree_position)
+        environment_system.add_tree_shadow(tree_position)
+
+
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
         self.set_state()
-        self.setup_collision_callbacks()
+        
 
         Clock.schedule_interval(self.update, 1./60.)
         Clock.schedule_once(self.setup_boundaries)
@@ -301,10 +398,13 @@ class DarkBunnyGame(Widget):
 
     def setup_states(self):
         self.gameworld.add_state(state_name='main', systems_added=[
-            'physics_renderer2', 'physics_renderer', 'hawk_physics_renderer'],
+            'physics_renderer2', 'physics_renderer',  'tree_physics_renderer', 'hawk_physics_renderer'],
             systems_removed=[], 
             systems_paused=[], systems_unpaused=[],
             screenmanager_screen='main')
+
+    def no_impact_collision(self, space, arbiter):
+        return False
 
     def setup_collision_callbacks(self):
         systems = self.gameworld.systems
@@ -314,15 +414,22 @@ class DarkBunnyGame(Widget):
         boundary_system = systems['boundary_system']
         physics.add_collision_handler(1, 2, 
             begin_func=rabbit_system.rabbit_collide_with_hole)
-        physics.add_collision_handler(10, 2, begin_func=rabbit_system.no_impact_collision)
+        physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1, 10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
-
-        physics.add_collision_handler(3, 1, begin_func=hawk_ai_system.no_impact_collision)
-        physics.add_collision_handler(3, 2, begin_func=hawk_ai_system.no_impact_collision)
-        physics.add_collision_handler(3, 10, begin_func=hawk_ai_system.no_impact_collision)
-        physics.add_collision_handler(3, 11, begin_func=hawk_ai_system.no_impact_collision)
-
+        physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 11, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
+        physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(1,4, begin_func=rabbit_system.enter_shadow,
+                                      separate_func=rabbit_system.leave_shadow)
+        physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 5, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(10, 11, begin_func=self.no_impact_collision)
 
     def set_state(self):
         self.gameworld.state = 'main'
@@ -330,6 +437,8 @@ class DarkBunnyGame(Widget):
     def setup_stuff(self, dt):
         self.add_rabbit()
         self.add_hole()
+        self.add_environment()
+        self.setup_collision_callbacks()
 
 
 class DebugPanel(Widget):

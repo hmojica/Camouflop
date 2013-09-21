@@ -32,6 +32,9 @@ DarkBunnyGame:
 			damping: .9
 		PhysicsRenderer:
 			gameworld: root.gameworld
+			system_id: 'shadow_renderer'
+		PhysicsRenderer:
+			gameworld: root.gameworld
 			system_id: 'physics_renderer2'
 	    PhysicsRenderer:
 	        gameworld: root.gameworld
@@ -43,6 +46,9 @@ DarkBunnyGame:
 	        system_id: 'boundary_system'
 	        gameworld: root.gameworld
 	        size: root.size
+		PhysicsRenderer:
+			gameworld: root.gameworld
+			system_id: 'tree_physics_renderer'
 	    HawkAISystem:
 	        id: hawk_ai_system
 			system_id: 'hawk_ai_system'
@@ -50,6 +56,10 @@ DarkBunnyGame:
 			update_time: 1./30.
 		RabbitSystem:
 			gameworld: root.gameworld
+			updateable: True
+			update_time: 1./30.
+		EnvironmentSystem:
+		    gameworld: root.gameworld
 		AnimationSystem:
 			gameworld: root.gameworld
 			updateable: True
