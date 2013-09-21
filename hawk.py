@@ -234,6 +234,3 @@ class HawkAISystem(GameSystem):
     #         return target_position
     #     else:
     #         return None
-
-    def no_impact_collision(self, space, arbiter):
-        return False
