@@ -6,9 +6,10 @@ import kivent_cython
 from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi
+from functools import partial
 
 class DarkBunnyGame(Widget):
-    rabbit = NumericProperty(None)
+    rabbit = NumericProperty(None, allownone=True)
     def __init__(self, **kwargs):
         super(DarkBunnyGame, self).__init__(**kwargs)
         Clock.schedule_once(self._init_game)
@@ -25,23 +26,27 @@ class DarkBunnyGame(Widget):
         entities = gameworld.entities
         rabbit_id = arbiter.shapes[0].body.data
         hole_id = arbiter.shapes[1].body.data
+        Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
+        self.rabbit = None
         print rabbit_id, hole_id
         return False
 
     def on_touch_down(self, touch):
-        rabbit = self.gameworld.entities[self.rabbit]
-        rabbit_position = rabbit['cymunk-physics']['position']
-        XDistance =  (rabbit_position[0]) - touch.x
-        YDistance =  (rabbit_position[1]) - touch.y
-        rotation = atan2(YDistance, XDistance) 
-        body = rabbit['cymunk-physics']['body']
-        body.reset_forces()
-        body.velocity = (0, 0)
-        body.angle = (rotation) - pi
-        unit_vector = body.rotation_vector
-        force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
-        force = 1000*unit_vector[0], 1000*unit_vector[1]
-        body.apply_force(force, force_offset)
+        print self.rabbit
+        if self.rabbit != None:
+            rabbit = self.gameworld.entities[self.rabbit]
+            rabbit_position = rabbit['cymunk-physics']['position']
+            XDistance =  (rabbit_position[0]) - touch.x
+            YDistance =  (rabbit_position[1]) - touch.y
+            rotation = atan2(YDistance, XDistance) 
+            body = rabbit['cymunk-physics']['body']
+            body.reset_forces()
+            body.velocity = (0, 0)
+            body.angle = (rotation) - pi
+            unit_vector = body.rotation_vector
+            force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
+            force = 1000*unit_vector[0], 1000*unit_vector[1]
+            body.apply_force(force, force_offset)
 
     def add_rabbit(self):
         x = 100
