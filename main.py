@@ -1,4 +1,6 @@
 import kivy
+import math
+import hawk
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.widget import Widget
@@ -8,6 +10,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi
 from functools import partial
+from random import randint
 from kivy.vector import Vector
 from kivy.core.image import Image as CoreImage
 
@@ -217,7 +220,6 @@ class AnimationSystem(GameSystem):
                 r_rendering_system['texture'] = texture_str
 
 
-
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
 
@@ -319,7 +321,13 @@ class DarkBunnyGame(Widget):
         self.setup_collision_callbacks()
 
         Clock.schedule_interval(self.update, 1./60.)
+        Clock.schedule_once(self.setup_hawk)
         Clock.schedule_once(self.setup_stuff)
+
+
+    def setup_hawk(self, dt):
+        hawk_ai_system = self.gameworld.systems['hawk_ai_system']
+        hawk_ai_system.spawn_hawk((500, 500))
 
     def setup_map(self):
         self.gameworld.currentmap = self.gameworld.systems['map']
@@ -329,7 +337,7 @@ class DarkBunnyGame(Widget):
 
     def setup_states(self):
         self.gameworld.add_state(state_name='main', systems_added=[
-            'physics_renderer2', 'physics_renderer'], 
+            'physics_renderer2', 'physics_renderer', 'hawk_physics_renderer'],
             systems_removed=[], 
             systems_paused=[], systems_unpaused=[],
             screenmanager_screen='main')
@@ -338,10 +346,15 @@ class DarkBunnyGame(Widget):
         systems = self.gameworld.systems
         physics = systems['cymunk-physics']
         rabbit_system = systems['rabbit_system']
+        hawk_ai_system = systems['hawk_ai_system']
         physics.add_collision_handler(1, 2, 
             begin_func=rabbit_system.rabbit_collide_with_hole)
         physics.add_collision_handler(10, 2, begin_func=rabbit_system.no_impact_collision)
         physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+
+        physics.add_collision_handler(3, 1, begin_func=hawk_ai_system.no_impact_collision)
+        physics.add_collision_handler(3, 2, begin_func=hawk_ai_system.no_impact_collision)
+        physics.add_collision_handler(3, 10, begin_func=hawk_ai_system.no_impact_collision)
 
     def set_state(self):
         self.gameworld.state = 'main'
