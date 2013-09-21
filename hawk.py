@@ -155,8 +155,8 @@ class HawkAISystem(GameSystem):
 
                 elif hawk_ai_data['state'] == 'fly_over':
                     target_position = hawk_ai_data['target_position']
-                    closex = abs(target_position[0] - hawk_position[0]) < 5
-                    closey = abs(target_position[1] - hawk_position[1]) < 5
+                    closex = abs(target_position[0] - hawk_position[0]) < 15
+                    closey = abs(target_position[1] - hawk_position[1]) < 15
                     if (closex and closey):
                         print 'reached target position'
                         hawk_ai_data['state'] = 'hold'
@@ -237,3 +237,6 @@ class HawkAISystem(GameSystem):
     #         return target_position
     #     else:
     #         return None
+
+    def no_impact_collision(self, space, arbiter):
+        return False
