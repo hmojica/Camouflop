@@ -1,6 +1,7 @@
 import kivy
 import math
 import hawk
+import boundary
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.widget import Widget
@@ -69,6 +70,18 @@ class RabbitSystem(GameSystem):
         self.stop_rabbit(rabbit_entity)
         return False
 
+    def collide_rabbit_and_boundary(self, space, arbiter):
+        print 'collide'
+        gameworld = self.gameworld
+        entities = gameworld.entities
+        # boundary_id = arbiter.shapes[0].body.data
+        rabbit_id = arbiter.shapes[1].body.data
+        rabbit_entity = entities[rabbit_id]
+        rabbit_body = rabbit_entity['cymunk-physics']['body']
+        rabbit_body.reset_forces()
+        rabbit_body.velocity = (0, 0)
+        rabbit_body.angular_velocity = (0, 0)
+        return False
 
     def add_rabbit(self, rabbit_type):
         rabbit_info = self.rabbit_dicts[rabbit_type]
@@ -268,12 +281,17 @@ class DarkBunnyGame(Widget):
         self.setup_collision_callbacks()
 
         Clock.schedule_interval(self.update, 1./60.)
+        Clock.schedule_once(self.setup_boundaries)
         Clock.schedule_once(self.setup_hawk)
         Clock.schedule_once(self.setup_stuff)
 
     def setup_hawk(self, dt):
         hawk_ai_system = self.gameworld.systems['hawk_ai_system']
         hawk_ai_system.spawn_hawk((500, 500))
+
+    def setup_boundaries(self, dt):
+        boundary_system = self.gameworld.systems['boundary_system']
+        boundary_system.add_boundaries()
 
     def setup_map(self):
         self.gameworld.currentmap = self.gameworld.systems['map']
@@ -293,45 +311,25 @@ class DarkBunnyGame(Widget):
         physics = systems['cymunk-physics']
         rabbit_system = systems['rabbit_system']
         hawk_ai_system = systems['hawk_ai_system']
+        boundary_system = systems['boundary_system']
         physics.add_collision_handler(1, 2, 
             begin_func=rabbit_system.rabbit_collide_with_hole)
         physics.add_collision_handler(10, 2, begin_func=rabbit_system.no_impact_collision)
-        physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(1, 10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
 
         physics.add_collision_handler(3, 1, begin_func=hawk_ai_system.no_impact_collision)
         physics.add_collision_handler(3, 2, begin_func=hawk_ai_system.no_impact_collision)
         physics.add_collision_handler(3, 10, begin_func=hawk_ai_system.no_impact_collision)
+        physics.add_collision_handler(3, 11, begin_func=hawk_ai_system.no_impact_collision)
+
+        physics.add_collision_handler(1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
 
     def set_state(self):
         self.gameworld.state = 'main'
 
-    def add_boundary(self, width, height, position):
-        shape_dict = {'width': width, 'height': height, 'mass': 0}
-        col_shape_dict = {'shape_type': 'box', 'elasticity': .5,
-                          'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
-        physics_component_dict = {'main_shape': 'box', 'velocity': (0, 0), 'position': position, 'angle':0, 'angular_velocity': 0,
-                                  'mass': 0, 'vel_limit': 1000, 'ang_vel_limit': math.radians(1000), 'col_shapes': [col_shape_dict]}
-        create_component_dict = {'cymunk-physics': physics_component_dict,
-                                 'physics_renderer': {'texture': '', 'size': (width, height)}}
-        component_order = ['cymunk-physics']
-        self.gameworld.init_entity(create_component_dict, component_order)
-
-    def add_boundaries(self):
-        gamescreen_width = self.size[0]
-        gamescreen_height = self.size[1]
-        ##left bounding box
-        self.add_boundary(gamescreen_height, 1, (0, gamescreen_height/2))
-        #bottom bounding box
-        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, 0))
-        #right bounding box
-        self.add_boundary(gamescreen_height, 1, (gamescreen_width, gamescreen_height/2))
-        #top bounding box
-        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, gamescreen_height))
-
     def setup_stuff(self, dt):
         self.add_rabbit()
         self.add_hole()
-        self.add_boundaries()
 
 
 class DebugPanel(Widget):

@@ -16,6 +16,7 @@ DarkBunnyGame:
 		id: gameworld
 		gamescreenmanager: gamescreenmanager
 		hawk_ai_system: hawk_ai_system
+		boundary_system: boundary_system
 		GameView:
 			focus_entity: False
 			updateable: False
@@ -37,6 +38,11 @@ DarkBunnyGame:
 	        system_id: 'hawk_physics_renderer'
 		PhysicsRenderer:
 			gameworld: root.gameworld
+	    BoundarySystem:
+	        id: boundary_system
+	        system_id: 'boundary_system'
+	        gameworld: root.gameworld
+	        size: root.size
 	    HawkAISystem:
 	        id: hawk_ai_system
 			system_id: 'hawk_ai_system'
