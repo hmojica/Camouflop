@@ -218,9 +218,50 @@ class AnimationSystem(GameSystem):
 
 
 
+class EnvironmentSystem(GameSystem):
+    system_id = StringProperty('environment_system')
 
+    def add_tree_shadow(self, position):
+        x = position[0]
+        y = position[1]
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': (x, y), 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 0,
+        'ang_vel_limit': 0,
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'shadow_renderer': {'texture':
+            'hole.png', 'size': (80, 80)},}
+        component_order = ['cymunk-physics', 'physics_renderer2']
+        self.gameworld.init_entity(create_component_dict, component_order)
 
-
+    def add_tree(self, position):
+        x = position[0]
+        y = position[1]
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 0, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': (x, y), 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 0,
+        'ang_vel_limit': 0,
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'tree_physics_renderer': {'texture':
+            'green_snow_tree.png', 'size': (80, 80)},}
+        component_order = ['cymunk-physics', 'physics_renderer2']
+        self.gameworld.init_entity(create_component_dict, component_order)
 
 
 class DarkBunnyGame(Widget):
@@ -263,6 +304,14 @@ class DarkBunnyGame(Widget):
         rabbit_system.add_rabbit('dark_bunny')
         rabbit_system.add_rabbit('white_rabbit_1')
 
+    def add_environment(self):
+        systems = self.gameworld.systems
+        environment_system = systems['environment_system']
+        tree_position = (300, 150)
+        environment_system.add_tree(tree_position)
+        environment_system.add_tree_shadow(tree_position)
+
+
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
@@ -300,6 +349,7 @@ class DarkBunnyGame(Widget):
     def setup_stuff(self, dt):
         self.add_rabbit()
         self.add_hole()
+        self.add_environment()
 
 
 class DebugPanel(Widget):
