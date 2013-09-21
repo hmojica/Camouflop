@@ -241,7 +241,7 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component,
         'shadow_renderer': {'texture':
             'hole.png', 'size': (80, 80)},}
-        component_order = ['cymunk-physics', 'physics_renderer2']
+        component_order = ['cymunk-physics', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def add_tree(self, position):
@@ -262,7 +262,7 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component,
         'tree_physics_renderer': {'texture':
             'green_snow_tree.png', 'size': (80, 80)},}
-        component_order = ['cymunk-physics', 'physics_renderer2']
+        component_order = ['cymunk-physics', 'tree_physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
 
@@ -311,7 +311,7 @@ class DarkBunnyGame(Widget):
         environment_system = systems['environment_system']
         tree_position = (300, 150)
         environment_system.add_tree(tree_position)
-        environment_system.add_tree_shadow(tree_position)
+      #  environment_system.add_tree_shadow(tree_position)
 
 
     def init_game(self, dt):
