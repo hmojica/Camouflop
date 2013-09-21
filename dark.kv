@@ -15,6 +15,24 @@ DarkBunnyGame:
 	GameWorld:
 		id: gameworld
 		gamescreenmanager: gamescreenmanager
+		GameView:
+			focus_entity: False
+			updateable: False
+			gameworld: root.gameworld
+			pos: root.pos
+			size: root.size
+		GameMap:
+			system_id: 'map'
+			map_size: root.size
+			gameworld: root.gameworld
+		CymunkPhysics:
+			gameworld: root.gameworld
+			damping: .9
+		PhysicsRenderer:
+			gameworld: root.gameworld
+			system_id: 'physics_renderer2'
+		PhysicsRenderer:
+			gameworld: root.gameworld
 		GameScreenManager:
 			id: gamescreenmanager
 			size: root.size
