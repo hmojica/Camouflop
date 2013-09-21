@@ -35,9 +35,6 @@ class DarkBunnyGame(Widget):
         self.rabbit = None
         return False
 
-        
-
-
     def on_touch_down(self, touch):
         print self.rabbit
         if self.rabbit != None:
