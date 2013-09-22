@@ -172,6 +172,7 @@ class DarkBunnyGame(Widget):
         self.add_environment()
         self.setup_collision_callbacks()
         self.gameworld.music_controller.play_new_song(30)
+        
 
 
 class DebugPanel(Widget):

@@ -161,6 +161,7 @@ class HawkAISystem(GameSystem):
                 velocity *= dt
                 target_position += velocity
                 return target_position
+
         return None
 
     def update(self, dt):
