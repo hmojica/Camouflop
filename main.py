@@ -20,7 +20,6 @@ class SliderSetting(Widget):
     slider_name = StringProperty('default')
     slider_value = NumericProperty(1.)
 
-
 class DarkBunnyGame(Widget):
 
     def __init__(self, **kwargs):
