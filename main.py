@@ -130,7 +130,6 @@ class DarkBunnyGame(Widget):
             begin_func=rabbit_system.rabbit_collide_with_hole)
         physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1, 10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
-        physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 11, begin_func=self.no_impact_collision)
@@ -145,6 +144,8 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(3, 4, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
         physics.add_collision_handler(10, 11, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(1, 3, begin_func=self.no_impact_collision,
+                                      separate_func=rabbit_system.collide_rabbit_with_hawk)
 
     def set_state(self):
         self.gameworld.state = 'main'
