@@ -149,7 +149,7 @@ class RabbitSystem(GameSystem):
 
     def get_rabbit_dict(self, rabbit_type):
         if rabbit_type == 'white_rabbit':
-            white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            white_rabbit_physics_renderer = dict(texture='assets/white_rabbit/WR1.png', size=(64, 64))
             white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
             '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
             'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
@@ -159,7 +159,7 @@ class RabbitSystem(GameSystem):
                     'physics_renderer': white_rabbit_physics_renderer,
                     'anim_state': white_rabbit_anim_dict}
         else:
-            dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            dark_bunny_physics_renderer = dict(texture='assets/black_rabbit/BR1.png', size=(64, 64))
             black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
                 '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
                 'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
