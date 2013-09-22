@@ -333,8 +333,7 @@ class DarkBunnyGame(Widget):
             Clock.schedule_once(self._init_game)
 
     def add_hole(self):
-        x = 500
-        y = 100
+        position = [Window.size[0]*.95, Window.size[1]/2]
         shape_dict = {'inner_radius': 0, 'outer_radius': 10, 
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5, 
@@ -342,7 +341,7 @@ class DarkBunnyGame(Widget):
         col_shapes = [col_shape]
         physics_component = {'main_shape': 'circle', 
         'velocity': (0, 0), 
-        'position': (x, y), 'angle': 0, 
+        'position': position, 'angle': 0,
         'angular_velocity': 0, 
         'vel_limit': 250, 
         'ang_vel_limit': radians(200), 
@@ -362,16 +361,14 @@ class DarkBunnyGame(Widget):
     def add_environment(self):
         systems = self.gameworld.systems
         environment_system = systems['environment_system']
-        tree_position = (300, 150)
+        tree_position = (Window.size[0] * 3/8, Window.size[1] * 1/4)
         environment_system.add_tree(tree_position)
         environment_system.add_tree_shadow(tree_position)
-
 
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
         self.set_state()
-        
 
         Clock.schedule_interval(self.update, 1./60.)
         Clock.schedule_once(self.setup_boundaries)
@@ -380,7 +377,16 @@ class DarkBunnyGame(Widget):
 
     def setup_hawk(self, dt):
         hawk_ai_system = self.gameworld.systems['hawk_ai_system']
-        hawk_ai_system.spawn_hawk((500, 500))
+        screen_width = Window.size[0]
+        screen_height = Window.size[1]
+        flyover_positions = [
+            [0 - screen_width*.1, 0 - screen_height*.1],
+            [screen_width / 2, screen_height + (screen_height*.1)],
+            [screen_width + screen_width * .1, 0 - screen_height*.1],
+            [0 - screen_width*.1, screen_height/4],
+            [screen_width * .1, screen_height * 1.1]]
+        size = [100, 100]
+        hawk_ai_system.spawn_hawk((self.size[0]/2, self.size[1]/2), flyover_positions, size)
 
     def setup_boundaries(self, dt):
         boundary_system = self.gameworld.systems['boundary_system']

@@ -11,11 +11,7 @@ class HawkAISystem(GameSystem):
     cycles_to_skip = NumericProperty(5)
     cycle_count = NumericProperty(0)
 
-    flyover_positions = [
-        [-50, -50],
-        [600, 600],
-        [0, 300],
-        [600, 100]]
+    flyover_positions = []
 
     def remove_entity(self, entity_id):
         super(HawkAISystem, self).remove_entity(entity_id)
@@ -193,15 +189,14 @@ class HawkAISystem(GameSystem):
     #     desired_angle = self.do_turning(target_vector, unit_vector, hawk_ai_data, physics_data['body'])
     #     self.do_thrusting(hawk_ai_data, desired_angle)
 
-    def spawn_hawk(self, position):
+    def spawn_hawk(self, position, flyover_positions, size):
+        self.flyover_positions = flyover_positions
         mass = 100
         max_speed = 25000
         acceleration = 25000
         offset_distance = 10
         angular_acceleration = 10
-        hawk_width = 100
-        hawk_height = 100
-        box_dict = {'width': hawk_width, 'height': hawk_height,
+        box_dict = {'width': size[0], 'height': size[1],
          'mass': mass}
         col_shape_dict = {'shape_type': 'box', 'elasticity': .5,
         'collision_type': 3, 'shape_info': box_dict, 'friction': 1.0}
@@ -214,7 +209,7 @@ class HawkAISystem(GameSystem):
         'is_turning': 'zero',
         'turn_speed_multiplier': 0, 'engine_speed_multiplier': 0}
         create_component_dict = {'cymunk-physics': physics_component_dict,
-        'hawk_physics_renderer': {'texture': 'hawk.png', 'size': (hawk_width, hawk_height)},
+        'hawk_physics_renderer': {'texture': 'hawk.png', 'size': (size[0], size[1])},
         'hawk_ai_system': hawk_ai_system}
         component_order = ['cymunk-physics', 'hawk_physics_renderer', 'hawk_ai_system']
         self.gameworld.init_entity(create_component_dict, component_order)
