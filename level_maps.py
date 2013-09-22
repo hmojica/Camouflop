@@ -27,6 +27,29 @@ class LevelMaps:
         },
         #level 2
         {
+            'dark_bunny': {'position': (.8, .8)},
+            'white_bunnies': [
+                {'position': (.1, .6)}
+                # {'position': (.8, .5)}
+            ],
+            'trees': [
+                {'position': (.5, .7), 'type': 'small'},
+                {'position': (.2, .4), 'type': 'small'},
+                {'position': (.5, .22), 'type': 'small'}
+            ],
+            'rocks': [
+                {'position': (.65, .85)},
+                {'position': (.7, .74)},
+                {'position': (.1, .15)},
+                {'position': (.18, .14)},
+                {'position': (.9, .15)},
+                {'position': (.8, .14)}
+            ],
+            'clouds': [],
+            'hole': {'position': (.1, .9)}
+        },
+        #level 3
+        {
             'dark_bunny': {'position': (.125, .167)},
             'white_bunnies': [
                 {'position': (.125, .67)}
