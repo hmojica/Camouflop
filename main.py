@@ -3,6 +3,8 @@ import math
 import hawk
 import boundary
 import rabbit
+import animation
+import environment
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.uix.widget import Widget
@@ -16,123 +18,6 @@ from random import randint
 from kivy.vector import Vector
 from kivy.core.image import Image as CoreImage
 from kivy.graphics import Rectangle
-
-class AnimationSystem(GameSystem):
-    '''
-    Animation component info looks like: {'states': {dict of state_name, state dicts, 'current_state': state_name}
-    state dict looks like: 'number_of_frames': integer, 'frame': 'graphic_str', 
-    'current_frame_time': float, 'time_between_frames': float, 'current_frame': int}
-    '''
-    renderer_to_modify = StringProperty('physics_renderer')
-    system_id = StringProperty('animation_system')
-    
-    def __init__(self, **kwargs):
-        super(AnimationSystem, self).__init__(**kwargs)
-        self.textures = {}
-
-    def load_texture(self, texture_str):
-        textures = self.textures
-        if texture_str not in textures:
-            textures[texture_str] = CoreImage(texture_str).texture
-        texture = textures[texture_str]
-        return texture
-
-    def update(self, dt):
-        gameworld = self.gameworld
-        entities = gameworld.entities
-        system_id = self.system_id
-        rendering_system = self.renderer_to_modify
-        load_texture = self.load_texture
-        for entity_id in self.entity_ids:
-            entity = entities[entity_id]
-            animation_system = entity[system_id]
-            r_rendering_system = entity[rendering_system]
-            current_state = animation_system['current_state']
-            state_dict = animation_system['states'][current_state]
-            state_dict['current_frame_time'] += dt
-            if state_dict['current_frame_time'] >= state_dict['time_between_frames']:
-                state_dict['current_frame_time'] -= state_dict['time_between_frames']
-                state_dict['current_frame'] += 1
-                if state_dict['current_frame'] >= state_dict['number_of_frames']:
-                    state_dict['current_frame'] = 0
-                texture_str = state_dict[str(state_dict['current_frame'])]
-                r_rendering_system['quad'].texture = load_texture(texture_str)
-                r_rendering_system['texture'] = texture_str
-
-
-class EnvironmentSystem(GameSystem):
-    system_id = StringProperty('environment_system')
-
-    # def add_hollow_log(self, position, angle):
-    #     x = position[0]
-    #     y = position[1]
-    #     shape_dict = {'width': 69, 'height': 128,
-    #     'mass': 100,}
-    #     col_shape = {'shape_type': 'box', 'elasticity': .5,
-    #     'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
-    #     col_shapes = [col_shape]
-    #     physics_component = {'main_shape': 'circle',
-    #     'velocity': (0, 0),
-    #     'position': (x, y), 'angle': angle,
-    #     'angular_velocity': 0,
-    #     'vel_limit': 0,
-    #     'ang_vel_limit': 0,
-    #     'mass': 0, 'col_shapes': col_shapes}
-    #     create_component_dict = {'cymunk-physics': physics_component,
-    #     'tree_physics_renderer': {'texture':
-    #         'assets/environment/Passable_Log_Closed.png', 'size': (86, 160)},}
-    #     component_order = ['cymunk-physics', 'tree_physics_renderer']
-    #     self.gameworld.init_entity(create_component_dict, component_order)
-    #
-    # def add_passable_log(self, center, angle):
-    #     self.add_hollow_log(center, angle)
-    #     boundary_system = self.gameworld.systems['boundary_system']
-    #     half_width = 36
-    #     boundary_system.add_boundary(1, 128, (center[0] + 36*cos(angle), center[1]-36*sin(angle)), angle)
-    #     boundary_system.add_boundary(1, 128, (center[0] - 36*cos(angle), center[1]+36*sin(angle)), angle)
-
-
-    def add_tree_shadow(self, position):
-        x = position[0]
-        y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 100,
-        'mass': 100, 'offset': (0, 0)}
-        col_shape = {'shape_type': 'circle', 'elasticity': .5,
-        'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
-        col_shapes = [col_shape]
-        physics_component = {'main_shape': 'circle',
-        'velocity': (0, 0),
-        'position': (x, y), 'angle': 0,
-        'angular_velocity': 0,
-        'vel_limit': 0,
-        'ang_vel_limit': 0,
-        'mass': 0, 'col_shapes': col_shapes}
-        create_component_dict = {'cymunk-physics': physics_component,
-        'shadow_renderer': {'texture':
-            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)},}
-        component_order = ['cymunk-physics', 'shadow_renderer']
-        self.gameworld.init_entity(create_component_dict, component_order)
-
-    def add_tree(self, position):
-        x = position[0]
-        y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
-        'mass': 100, 'offset': (0, 0)}
-        col_shape = {'shape_type': 'circle', 'elasticity': .5,
-        'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
-        col_shapes = [col_shape]
-        physics_component = {'main_shape': 'circle',
-        'velocity': (0, 0),
-        'position': (x, y), 'angle': 0,
-        'angular_velocity': 0,
-        'vel_limit': 0,
-        'ang_vel_limit': 0,
-        'mass': 0, 'col_shapes': col_shapes}
-        create_component_dict = {'cymunk-physics': physics_component,
-        'tree_physics_renderer': {'texture':
-            'assets/environment/green_snow_tree.png', 'size': (80, 80)},}
-        component_order = ['cymunk-physics', 'tree_physics_renderer']
-        self.gameworld.init_entity(create_component_dict, component_order)
 
 
 class BackgroundWidget(Widget):
