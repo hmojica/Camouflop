@@ -49,7 +49,6 @@ class LevelsSystem(GameSystem):
         for tree in trees:
             tree_position1 = (Window.size[0] * tree['position'][0], Window.size[1] * tree['position'][1])
             environment_system.add_tree(tree_position1, tree['type'])
-            environment_system.add_tree_shadow(tree_position1, tree['type'])
 
     def add_rocks(self, rocks):
         environment_system = self.gameworld.systems['environment_system']
