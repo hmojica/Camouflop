@@ -11,16 +11,16 @@ class LevelMaps:
                 {'position': (.8, .3), 'type': 'small_tree'}
             ],
             'rocks': [
-                {'position': (.25, .85)},
-                {'position': (.25, .74)},
-                {'position': (.5, .5)},
-                {'position': (.5, .39)},
-                {'position': (.5, .28)},
-                {'position': (.5, .17)},
-                {'position': (.5, .06)},
-                {'position': (.75, .75)},
-                {'position': (.75, .64)},
-                {'position': (.75, .86)}
+                {'position': (.25, .85), 'type': 'large_rock'},
+                {'position': (.25, .74), 'type': 'large_rock'},
+                {'position': (.5, .5), 'type': 'med_rock'},
+                {'position': (.5, .39), 'type': 'large_rock'},
+                {'position': (.5, .28), 'type': 'large_rock'},
+                {'position': (.5, .17), 'type': 'med_rock'},
+                {'position': (.5, .06), 'type': 'large_rock'},
+                {'position': (.75, .75), 'type': 'med_rock'},
+                {'position': (.75, .64), 'type': 'large_rock'},
+                {'position': (.75, .86), 'type': 'small_rock'}
             ],
             'clouds': [],
             'hole': {'position': (.90, .75)}
@@ -38,12 +38,12 @@ class LevelMaps:
                 {'position': (.5, .22), 'type': 'small_tree'}
             ],
             'rocks': [
-                {'position': (.65, .85)},
-                {'position': (.7, .74)},
-                {'position': (.1, .15)},
-                {'position': (.18, .14)},
-                {'position': (.9, .15)},
-                {'position': (.8, .14)}
+                {'position': (.65, .85), 'type': 'large_rock'},
+                {'position': (.7, .74), 'type': 'large_rock'},
+                {'position': (.1, .15), 'type': 'large_rock'},
+                {'position': (.18, .14), 'type': 'large_rock'},
+                {'position': (.9, .15), 'type': 'large_rock'},
+                {'position': (.8, .14), 'type': 'large_rock'}
             ],
             'clouds': [
                 {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
@@ -62,11 +62,11 @@ class LevelMaps:
                 {'position': (.75, .75), 'type': 'small_tree'}
             ],
             'rocks': [
-                {'position': (.9, .4)},
-                {'position': (.85, .5)},
-                {'position': (.55, .9)},
-                {'position': (.55, .8)},
-                {'position': (.55, .7)}
+                {'position': (.9, .4), 'type': 'large_rock'},
+                {'position': (.85, .5), 'type': 'large_rock'},
+                {'position': (.55, .9), 'type': 'large_rock'},
+                {'position': (.55, .8), 'type': 'large_rock'},
+                {'position': (.55, .7), 'type': 'large_rock'}
             ],
             'clouds': [
                 {'position': (.3, .2), 'type': 'large_feather', 'vel_max': 50, 'ang_vel': -.15},
