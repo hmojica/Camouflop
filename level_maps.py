@@ -3,7 +3,7 @@ class LevelMaps:
         #level 1
         {
             'trees': [
-                {'position': (.5, .5), 'type': 'small'}
+                {'position': (.5, .5), 'type': 'small_tree'}
             ],
             'rocks': [],
             'clouds': [],
@@ -12,9 +12,9 @@ class LevelMaps:
         #level 2
         {
             'trees': [
-                {'position': (.5, .25), 'type': 'small'},
-                {'position': (.25, .75), 'type': 'small'},
-                {'position': (.75, .75), 'type': 'small'}
+                {'position': (.5, .25), 'type': 'small_tree'},
+                {'position': (.25, .75), 'type': 'small_tree'},
+                {'position': (.75, .75), 'type': 'small_tree'}
             ],
             'rocks': [
                 {'position': (.9, .4)},

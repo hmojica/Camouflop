@@ -31,6 +31,10 @@ DarkBunnyGame:
 			gameworld: root.gameworld
 		MusicController:
             id: music_controller
+        QuadTreePointRenderer:
+			system_id: 'quadtree_renderer'
+			render_information_from: 'position'
+			gameworld: root.gameworld
 		CymunkPhysics:
 			gameworld: root.gameworld
 			damping: .9
@@ -41,6 +45,9 @@ DarkBunnyGame:
 			gameworld: root.gameworld
 			system_id: 'physics_renderer2'
 		PhysicsRenderer:
+			gameworld: root.gameworld
+		GameSystem:
+			system_id: 'position'
 			gameworld: root.gameworld
 	    BoundarySystem:
 	        id: boundary_system

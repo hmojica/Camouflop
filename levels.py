@@ -62,7 +62,7 @@ class LevelsSystem(GameSystem):
         for cloud in clouds:
             cloud_position = (Window.size[0] * cloud['position'][0], Window.size[1] * cloud['position'][1])
             cloud_type = cloud['type']
-            environment_system.add_cloud(cloud_position, cloud_type, vel_max=50, ang_vel=-.15)
+            environment_system.add_cloud(cloud_position, cloud_type, vel_max=50)
 
     def add_hole(self, hole):
         environment_system = self.gameworld.systems['environment_system']
