@@ -45,14 +45,27 @@ class DarkBunnyGame(Widget):
         self.gameworld.update(dt)
 
     def setup_states(self):
-        self.gameworld.add_state(state_name='main', systems_added=[
-            'physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer'],
+        self.gameworld.add_state(state_name='main', systems_added=['shadow_renderer', 
+            'physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer',],
             systems_removed=[],
-            systems_paused=[], systems_unpaused=[],
+            systems_paused=[], systems_unpaused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer',
+            'animation_system', 'shadow_renderer'],
             screenmanager_screen='main')
+        self.gameworld.add_state(state_name='menu', systems_added=[],
+            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer',],
+            systems_paused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'animation_system'], systems_unpaused=[],
+            screenmanager_screen='menu')
 
     def no_impact_collision(self, space, arbiter):
         return False
+
+    def start_game(self):
+        self.gameworld.state = 'main'
 
     def setup_collision_callbacks(self):
         systems = self.gameworld.systems
@@ -86,7 +99,7 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(2, 4, begin_func=self.no_impact_collision)
 
     def set_state(self):
-        self.gameworld.state = 'main'
+        self.gameworld.state = 'menu'
 
     def setup_stuff(self, dt):
         systems = self.gameworld.systems
@@ -107,6 +120,8 @@ class DebugPanel(Widget):
         self.fps = str(int(Clock.get_fps()))
 
 class DarkApp(App):
+    music_level = NumericProperty(1.)
+    sound_level = NumericProperty(1.)
 
     def build(self):
         pass
