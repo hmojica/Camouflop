@@ -21,8 +21,7 @@ from kivy.graphics import Rectangle
 
 
 class DarkBunnyGame(Widget):
-    bg_texture = ObjectProperty(None)
-    
+
     def __init__(self, **kwargs):
         super(DarkBunnyGame, self).__init__(**kwargs)
         Clock.schedule_once(self._init_game)
@@ -51,7 +50,7 @@ class DarkBunnyGame(Widget):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component, 
         'physics_renderer2': {'texture': 
-            'hole.png', 'size': (80, 80)},}
+            'assets/environment/RabbitHole.png', 'size': (80, 80)},}
         component_order = ['cymunk-physics', 'physics_renderer2']
         self.gameworld.init_entity(create_component_dict, component_order)
 

@@ -26,8 +26,10 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, 2)
             if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
                 self.targeted = rabbit_entity['id']
-            if  self.targeted is not None and entities[self.targeted]['rabbit_system']['visibility'] < 800:
-                self.targeted = None
+            if  self.targeted is not None:
+                if 'rabbit_system' in entities[self.targeted]:
+                    if entities[self.targeted]['rabbit_system']['visibility'] < 800:
+                        self.targeted = None
 
     def collide_rabbit_with_hawk(self, space, arbiter):
         rabbit_id = arbiter.shapes[0].body.data
@@ -59,7 +61,7 @@ class RabbitSystem(GameSystem):
         '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
         'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
         'current_frame_time': 0., 'number_of_frames': 6}
-        rabbit_dicts['dark_bunny'] = {'outer_radius': 20, 'mass': 50, 'x': 100, 'y': 100,
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50, 'x': 100, 'y': 100,
                                       'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
                                       'anim_state': black_rabbit_anim_dict}
         rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': 100, 'y': 400,

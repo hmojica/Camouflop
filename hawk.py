@@ -198,7 +198,7 @@ class HawkAISystem(GameSystem):
         angular_acceleration = 10
         hawk_width = 172
         hawk_height = 86
-        box_dict = {'width': hawk_width, 'height': hawk_height,
+        box_dict = {'width': 70, 'height': 80,
          'mass': mass}
         col_shape_dict = {'shape_type': 'box', 'elasticity': .5,
         'collision_type': 3, 'shape_info': box_dict, 'friction': 1.0}
