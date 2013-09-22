@@ -11,6 +11,7 @@ class RabbitSystem(GameSystem):
     rabbit = NumericProperty(None, allownone=True)
     white_rabbits = []
     targeted = None
+    dead_rabbits = False
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
@@ -26,6 +27,8 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, 2)
             if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
                 self.targeted = rabbit_entity['id']
+                sound_system = self.gameworld.systems['sound_system']
+                Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_diving'))
             if  self.targeted is not None:
                 if 'rabbit_system' in entities[self.targeted]:
                     if entities[self.targeted]['rabbit_system']['visibility'] < 800:
@@ -35,8 +38,11 @@ class RabbitSystem(GameSystem):
         rabbit_id = arbiter.shapes[0].body.data
         if rabbit_id == self.targeted:
             Clock.schedule_once(partial(self.gameworld.timed_remove_entity, self.targeted))
+            self.dead_rabbits = True
             if self.rabbit == self.targeted:
                 self.rabbit = None
+                sound_system = self.gameworld.systems['sound_system']
+                Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_victory'))
             elif self.targeted in self.white_rabbits:
                 self.white_rabbits.remove(self.targeted)
             self.targeted = None
@@ -83,16 +89,17 @@ class RabbitSystem(GameSystem):
             Clock.schedule_once(gameworld.systems['levels_system'].clear_level)
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
+        if self.rabbit == None and self.white_rabbits == []:
+            sound_system = gameworld.systems['sound_system']
+            Clock.schedule_once(partial(sound_system.schedule_play, 'rabbit_victory'))
         return False
 
     def enter_shadow(self, space, arbiter):
-        print 'start of begin'
         rabbit_id = arbiter.shapes[0].body.data
         rabbit_entity = self.gameworld.entities[rabbit_id]
         rabbit_entity['rabbit_system']['shadow_count'] += 1
         is_black = rabbit_id == self.rabbit
         self.update_is_safe(rabbit_entity, is_black)
-        print 'calling begin'
         return False
 
     def update_is_safe(self, rabbit_entity, is_black):
@@ -163,7 +170,7 @@ class RabbitSystem(GameSystem):
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
         rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
-                         'shadow_count': 0}
+                         'shadow_count': 0, 'acceleration': 1000, 'touch_effect_radius': 5}
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system,
         'animation_system': animation_system}
@@ -180,6 +187,8 @@ class RabbitSystem(GameSystem):
                 self.stop_rabbit(self.gameworld.entities[called_rabbit])
             elif self.rabbit is not None:
                 self.call_rabbit(called_rabbit)
+                sound_system = self.gameworld.systems['sound_system']
+                Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'))
         elif self.rabbit is not None:
             rabbit = self.gameworld.entities[self.rabbit]
             rabbit_position = rabbit['cymunk-physics']['position']
@@ -194,8 +203,12 @@ class RabbitSystem(GameSystem):
         body.angle = (rotation) - pi
         body.angular_velocity = 0
         unit_vector = body.rotation_vector
-        force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
-        force = 1000*unit_vector[0], 1000*unit_vector[1]
+        rabbit_type = rabbit['rabbit_system']['rabbit_type']
+        rabbit_info = self.rabbit_dicts[rabbit_type]
+        outer_radius = rabbit_info['outer_radius']
+        force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
+        acceleration = rabbit['rabbit_system']['acceleration']
+        force = acceleration * unit_vector[0], acceleration * unit_vector[1]
         body.apply_force(force, force_offset)
 
     def stop_rabbit(self, rabbit_entity):
@@ -204,6 +217,8 @@ class RabbitSystem(GameSystem):
         body.velocity = (0, 0)
 
     def call_rabbit(self, rabbit_id):
+        sound_system = self.gameworld.systems['sound_system']
+        Clock.schedule_once(partial(sound_system.schedule_play, 'rabbit'))
         rabbit = self.gameworld.entities[rabbit_id]
         black_rabbit = self.gameworld.entities[self.rabbit]
         black_rabbit_position = black_rabbit['cymunk-physics']['position']
@@ -212,27 +227,9 @@ class RabbitSystem(GameSystem):
         YDistance = (white_rabbit_position[1]) - (black_rabbit_position[1])
         self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
-    def calculate_desired_vector(self, target, location, ship_data, ship_ai_data):
-        g_map = self.gameworld.systems['default_map']
-        map_size_x = g_map.map_size[0]/1.9
-        map_size_y = g_map.map_size[1]/1.9
-        dist_x = math.fabs(target[0] - location[0])
-        dist_y = math.fabs(target[1] - location[1])
-        ship_ai_data['distance_to_target'] = Vector(target).distance2(location)
-        max_speed = ship_data['max_speed']
-        v = Vector(target) - Vector(location)
-        v = v.normalize()
-        v *= max_speed
-        if ship_ai_data['ai_state'] == 'flee':
-            v *= -1
-        if dist_x > map_size_x:
-            v[0] *=-1
-        if dist_y > map_size_y:
-            v[1] *=-1
-        return v
-
     def touch_rabbit(self, touch):
-        touch_square = self.query_physics_bb((touch.x,touch.y),5)
+        touch_effect_radius = 5
+        touch_square = self.query_physics_bb((touch.x, touch.y), touch_effect_radius)
         nonplayer_rabbits = self.white_rabbits
         for entity_id in touch_square:
             if entity_id == self.rabbit:

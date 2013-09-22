@@ -154,14 +154,15 @@ class HawkAISystem(GameSystem):
         current_player_character_id = rabbit_system.targeted
         if current_player_character_id:
             current_player_character = entities[current_player_character_id]
-            target_physics_data = current_player_character['cymunk-physics']
-            target_position = Vector(target_physics_data['position'])
-            velocity = Vector(target_physics_data['body'].velocity)
-            velocity *= dt
-            target_position += velocity
-            return target_position
-        else:
-            return None
+            if 'cymunk-physics' in current_player_character:
+                target_physics_data = current_player_character['cymunk-physics']
+                target_position = Vector(target_physics_data['position'])
+                velocity = Vector(target_physics_data['body'].velocity)
+                velocity *= dt
+                target_position += velocity
+                return target_position
+
+        return None
 
     def update(self, dt):
         gameworld = self.gameworld

@@ -15,17 +15,18 @@ class LevelsSystem(GameSystem):
         #level 1
         {
             'trees': [
-                {'position': (.5, .5)}
+                {'position': (.5, .5), 'type': 'small'}
             ],
             'rocks': [],
-            'clouds': []
+            'clouds': [],
+            'hole': {'position': (.95, .5)}
         },
         #level 2
         {
             'trees': [
-                {'position': (.5, .25)},
-                {'position': (.25, .75)},
-                {'position': (.75, .75)}
+                {'position': (.5, .25), 'type': 'small'},
+                {'position': (.25, .75), 'type': 'small'},
+                {'position': (.75, .75), 'type': 'small'}
             ],
             'rocks': [
                 {'position': (.9, .4)},
@@ -35,9 +36,10 @@ class LevelsSystem(GameSystem):
                 {'position': (.55, .7)}
             ],
             'clouds': [
-                {'position': (.3, .2), 'size': 'LARGE'},
-                {'position': (.6, .8), 'size': 'SMALL'}
-            ]
+                {'position': (.3, .2), 'type': 'large_feather', 'vel_max': 50, 'ang_vel': -.15},
+                {'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}
+            ],
+            'hole': {'position': (.95, .5)}
         }
     ]
 
@@ -70,41 +72,13 @@ class LevelsSystem(GameSystem):
         systems['rabbit_system'].clear_rabbits()
         systems['environment_system'].clear_objects()
         systems['hawk_ai_system'].clear_hawk()
-        ##clear hole
-        for entity_id in self.entity_ids:
-            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
-
-    def add_hole(self):
-        position = [Window.size[0]*.95, Window.size[1]/2]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
-        'mass': 100, 'offset': (0, 0)}
-        col_shape = {'shape_type': 'circle', 'elasticity': .5,
-        'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
-        col_shapes = [col_shape]
-        physics_component = {'main_shape': 'circle',
-        'velocity': (0, 0),
-        'position': position, 'angle': 0,
-        'angular_velocity': 0,
-        'vel_limit': 250,
-        'ang_vel_limit': radians(200),
-        'mass': 0, 'col_shapes': col_shapes}
-        create_component_dict = {'cymunk-physics': physics_component,
-        'physics_renderer2': {'texture':
-            'assets/environment/RabbitHole.png', 'size': (80, 80)},}
-        component_order = ['cymunk-physics', 'physics_renderer2']
-        self.gameworld.init_entity(create_component_dict, component_order)
-
-    def add_objects(self, elements, callback):
-        for element in elements:
-            position = (Window.size[0] * element['position'][0], Window.size[1] * element['position'][1])
-            callback(position)
 
     def add_trees(self, trees):
         environment_system = self.gameworld.systems['environment_system']
         for tree in trees:
             tree_position1 = (Window.size[0] * tree['position'][0], Window.size[1] * tree['position'][1])
-            environment_system.add_tree(tree_position1)
-            environment_system.add_tree_shadow(tree_position1)
+            environment_system.add_tree(tree_position1, tree['type'])
+            environment_system.add_tree_shadow(tree_position1, tree['type'])
 
     def add_rocks(self, rocks):
         environment_system = self.gameworld.systems['environment_system']
@@ -116,27 +90,19 @@ class LevelsSystem(GameSystem):
         environment_system = self.gameworld.systems['environment_system']
         for cloud in clouds:
             cloud_position = (Window.size[0] * cloud['position'][0], Window.size[1] * cloud['position'][1])
-            cloud_size = cloud['size']
-            texture = ''
-            img_w = 0
-            img_h = 0
-            max_vel = 0
-            if cloud_size == 'SMALL':
-                texture = 'assets/environment/CloudSMfeather1.png'
-                img_w = 196
-                img_h = 87
-                max_vel = 30
-            elif cloud_size == 'LARGE':
-                texture = 'assets/environment/CloudLGfeather1.png'
-                img_w = 389
-                img_h = 171
-                max_vel = 50
-            environment_system.add_cloud(cloud_position, texture, img_w, img_h, max_vel)
+            cloud_type = cloud['type']
+            environment_system.add_cloud(cloud_position, cloud_type, vel_max=50, ang_vel=-.15)
+
+    def add_hole(self, hole):
+        environment_system = self.gameworld.systems['environment_system']
+        hole_position = (Window.size[0] * hole['position'][0], Window.size[1] * hole['position'][1])
+        environment_system.add_hole(hole_position)
 
     def add_environments(self, level_map):
         self.add_trees(level_map['trees'])
         self.add_rocks(level_map['rocks'])
         self.add_clouds(level_map['clouds'])
+        self.add_hole(level_map['hole'])
 
     def add_rabbits(self):
         systems = self.gameworld.systems
@@ -153,10 +119,7 @@ class LevelsSystem(GameSystem):
         boundary_system.add_boundaries()
 
     def generate_next_level(self, dt):
-        # if self.current_level_id > 0:
-        #     self.clear_level()
         self.add_rabbits()
-        self.add_hole()
         self.add_boundaries()
         self.add_hawk()
         self.add_environments(self.levels[self.current_level_id])

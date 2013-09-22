@@ -1,6 +1,12 @@
 import kivy
 import math
 import levels
+import hawk
+import boundary
+import rabbit
+import animation
+import environment
+import sound
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty, ListProperty
 from kivy.uix.widget import Widget
@@ -52,18 +58,16 @@ class DarkBunnyGame(Widget):
 
     def add_environment(self):
         systems = self.gameworld.systems
+
         environment_system = systems['environment_system']
         tree_position1 = (Window.size[0] * .5, Window.size[1] * .25)
-        environment_system.add_tree(tree_position1)
-        environment_system.add_tree_shadow(tree_position1)
+        environment_system.add_tree(tree_position1, 'small')
 
         tree_position2 = (Window.size[0] * .25, Window.size[1] * .75)
-        environment_system.add_tree(tree_position2)
-        environment_system.add_tree_shadow(tree_position2)
+        environment_system.add_tree(tree_position2, 'small')
 
         tree_position3 = (Window.size[0] * .75, Window.size[1] * .75)
-        environment_system.add_tree(tree_position3)
-        environment_system.add_tree_shadow(tree_position3)
+        environment_system.add_tree(tree_position3, 'small')
 
         rock_position1 = (Window.size[0] * .90, Window.size[1] * .40)
         environment_system.add_rock(rock_position1)
@@ -81,12 +85,10 @@ class DarkBunnyGame(Widget):
         environment_system.add_rock(rock_position5)
 
         cloud_position1 = (Window.size[0] * .30, Window.size[1] * .20)
-        environment_system.add_cloud(cloud_position1,
-                                     'assets/environment/CloudLGfeather1.png', 389, 171, 50)
+        environment_system.add_cloud(cloud_position1, 'large_feather', vel_max=50, ang_vel=-.15)
 
         cloud_position2 = (Window.size[0] * .60, Window.size[1] * .80)
-        environment_system.add_cloud(cloud_position2,
-                                     'assets/environment/CloudSMfeather1.png', 196, 87, 30)
+        environment_system.add_cloud(cloud_position2, 'small_feather', vel_max=30, ang_vel=.1)
 
 
 
@@ -141,6 +143,7 @@ class DarkBunnyGame(Widget):
                                       separate_func=rabbit_system.collide_rabbit_with_hawk)
         physics.add_collision_handler(4, 4, begin_func=self.no_impact_collision)
         physics.add_collision_handler(5, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(5, 10, begin_func=self.no_impact_collision)
         physics.add_collision_handler(11, 4, begin_func=self.no_impact_collision)
         physics.add_collision_handler(2, 4, begin_func=self.no_impact_collision)
 
@@ -152,6 +155,7 @@ class DarkBunnyGame(Widget):
         levels_system = systems['levels_system']
         Clock.schedule_once(levels_system.generate_next_level)
         self.setup_collision_callbacks()
+        self.gameworld.music_controller.play_new_song(30)
 
 
 class DebugPanel(Widget):

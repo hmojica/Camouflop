@@ -1,43 +1,23 @@
+from math import radians
 from kivy.properties import StringProperty
 from kivent_cython import GameSystem, Clock, partial
+
 
 
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
 
-    # def add_hollow_log(self, position, angle):
-    # x = position[0]
-    # y = position[1]
-    # shape_dict = {'width': 69, 'height': 128,
-    # 'mass': 100,}
-    # col_shape = {'shape_type': 'box', 'elasticity': .5,
-    # 'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
-    # col_shapes = [col_shape]
-    # physics_component = {'main_shape': 'circle',
-    # 'velocity': (0, 0),
-    # 'position': (x, y), 'angle': angle,
-    # 'angular_velocity': 0,
-    # 'vel_limit': 0,
-    # 'ang_vel_limit': 0,
-    # 'mass': 0, 'col_shapes': col_shapes}
-    # create_component_dict = {'cymunk-physics': physics_component,
-    # 'tree_physics_renderer': {'texture':
-    # 'assets/environment/Passable_Log_Closed.png', 'size': (86, 160)},}
-    # component_order = ['cymunk-physics', 'tree_physics_renderer']
-    # self.gameworld.init_entity(create_component_dict, component_order)
-    #
-    # def add_passable_log(self, center, angle):
-    # self.add_hollow_log(center, angle)
-    # boundary_system = self.gameworld.systems['boundary_system']
-    # half_width = 36
-    # boundary_system.add_boundary(1, 128, (center[0] + 36*cos(angle), center[1]-36*sin(angle)), angle)
-    # boundary_system.add_boundary(1, 128, (center[0] - 36*cos(angle), center[1]+36*sin(angle)), angle)
+    def get_tree_shadow_renderer(self, type):
+        if type == 'small':
+            return {'texture':
+            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)}
 
 
-    def add_tree_shadow(self, position):
+    def add_tree_shadow(self, position, type):
         x = position[0] + 50
         y = position[1] - 50
-        shape_dict = {'inner_radius': 0, 'outer_radius': 100,
+        shadow_renderer = self.get_tree_shadow_renderer(type)
+        shape_dict = {'inner_radius': 0, 'outer_radius': shadow_renderer['size'][0]/2,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
@@ -49,40 +29,39 @@ class EnvironmentSystem(GameSystem):
         'vel_limit': 0,
         'ang_vel_limit': 0,
         'mass': 0, 'col_shapes': col_shapes}
-        # create_component_dict = {'cymunk-physics': physics_component,
-        # 'shadow_renderer': {'texture':
-        #     'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)}, 'environment_system': {'type': 'shadow'}}
-        # component_order = ['cymunk-physics', 'shadow_renderer', 'environment_system']
         create_component_dict = {'cymunk-physics': physics_component,
-        'shadow_renderer': {'texture':
-            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)}, }
-        component_order = ['cymunk-physics', 'shadow_renderer', ]
+        'shadow_renderer': shadow_renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'shadow_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
-    def add_cloud(self, position, img, image_size_w, image_size_h, vel_max ):
+    def get_cloud_renderer(self, type):
+        if type == 'large_feather':
+            return {'texture':
+            'assets/environment/CloudLGfeather1.png', 'size': (389, 171)}
+        if type == 'small_feather':
+            return {'texture': 'assets/environment/CloudSMfeather1.png', 'size': (196, 87)}
+
+    def add_cloud(self, position, type, vel_max=30, ang_vel=0, ang_vel_max=0, angle=0):
+        if ang_vel_max == 0:
+            ang_vel_max = ang_vel
         x = position[0]
         y = position[1]
-        width = image_size_w
-        height = image_size_h
-        shape_dict = {'width': width*.80, 'height': height*.8, 'mass': 100}
+        renderer = self.get_cloud_renderer(type)
+        size = renderer['size']
+        shape_dict = {'width': size[0]*.80, 'height': size[1]*.8, 'mass': 100}
         col_shape = {'shape_type': 'box', 'elasticity': .5,
         'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
         physics_component = {'main_shape': 'box',
         'velocity': (50, 10),
-        'position': (x, y), 'angle': 0,
-        'angular_velocity': 0,
+        'position': (x, y), 'angle': angle,
+        'angular_velocity': ang_vel,
         'vel_limit': vel_max,
-        'ang_vel_limit': 0,
+        'ang_vel_limit': ang_vel_max,
         'mass': 100, 'col_shapes': col_shapes}
-        # create_component_dict = {'cymunk-physics': physics_component,
-        # 'hawk_physics_renderer': {'texture':
-        #     img, 'size': (width, height)}, 'environment_system': {'type': 'cloud'}}
-        # component_order = ['cymunk-physics', 'hawk_physics_renderer', 'environment_system']
         create_component_dict = {'cymunk-physics': physics_component,
-        'hawk_physics_renderer': {'texture':
-            img, 'size': (width, height)}, }
-        component_order = ['cymunk-physics', 'hawk_physics_renderer',]
+        'hawk_physics_renderer': renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'hawk_physics_renderer', 'environment_system']
         cloud_id = self.gameworld.init_entity(create_component_dict, component_order)
         cloud = self.gameworld.entities[cloud_id]
         physics_data = cloud['cymunk-physics']
@@ -94,11 +73,15 @@ class EnvironmentSystem(GameSystem):
         force = 1000 * unit_vector[0], 1000 * unit_vector[1]
         physics_body.apply_force(force, force_offset)
 
+    def get_tree_renderer(self, type):
+        if type == 'small':
+            return {'texture': 'assets/environment/green_snow_tree.png', 'size': (80, 80)}
 
-    def add_tree(self, position):
+    def add_tree(self, position, type):
         x = position[0]
         y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        physics_renderer = self.get_tree_renderer(type)
+        shape_dict = {'inner_radius': 0, 'outer_radius': physics_renderer['size'][0]/8,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
@@ -111,19 +94,20 @@ class EnvironmentSystem(GameSystem):
         'ang_vel_limit': 0,
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
-        'tree_physics_renderer': {'texture':
-            'assets/environment/green_snow_tree.png', 'size': (80, 80)}, 'environment_system': {'type': 'tree'}}
+        'tree_physics_renderer': physics_renderer, 'environment_system': {}}
         component_order = ['cymunk-physics', 'tree_physics_renderer', 'environment_system']
-        # create_component_dict = {'cymunk-physics': physics_component,
-        # 'tree_physics_renderer': {'texture':
-        #     'assets/environment/green_snow_tree.png', 'size': (80, 80)}, }
-        # component_order = ['cymunk-physics', 'tree_physics_renderer', ]
         self.gameworld.init_entity(create_component_dict, component_order)
+        self.add_tree_shadow(position, type)
 
-    def add_rock(self, position):
+    def get_rock_renderer(self, type):
+        if type == 'rock':
+            return {'texture': 'assets/environment/rock.png', 'size': (70, 70)}
+
+    def add_rock(self, position, type='rock'):
         x = position[0]
         y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        renderer = self.get_rock_renderer(type)
+        shape_dict = {'inner_radius': 0, 'outer_radius': renderer['size'][0]/2.,
         'mass': 100, 'offset': (0, 0)}
         col_shape_dict = {'shape_type': 'circle', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict,
                           'friction': 1.0}
@@ -135,12 +119,29 @@ class EnvironmentSystem(GameSystem):
         #                          'environment_system': {'type': 'rock'}}
         # component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
         create_component_dict = {'cymunk-physics': physics_component_dict,
-                                 'physics_renderer': {'texture': 'assets/environment/rock.png', 'size': (50, 50)},}
+                                 'physics_renderer': renderer,}
         component_order = ['cymunk-physics', 'physics_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def add_hole(self, position):
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': position, 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 250,
+        'ang_vel_limit': radians(200),
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'physics_renderer2': {'texture':
+            'assets/environment/RabbitHole.png', 'size': (80, 80)}, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'physics_renderer2', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def clear_objects(self):
         for entity_id in self.entity_ids:
-            entity = self.gameworld.entities[entity_id]
-            if entity['environment_system']['type'] != 'shadow':
-                Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
+            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
