@@ -139,14 +139,22 @@ class LevelMaps:
             'dark_bunny': {'position': (.9, .9)},
             'white_bunnies': [
                 {'position': (.1, .125)},
-                {'position': (.1, .25)}
+                {'position': (.1, .25)},
+                {'position': (.1, .375)},
+                {'position': (.1, .5)},
+                {'position': (.1, .625)},
+                {'position': (.1, .75)}
             ],
             'trees': [],
             'rocks': [],
             'clouds':[],
             'holes': [
-                {'position': (.9, .125)},
-                {'position': (.8, .25)}
+                {'position': (.7, .125)},
+                {'position': (.9, .25)},
+                {'position': (.8, .375)},
+                {'position': (.7, .5)},
+                {'position': (.9, .625)},
+                {'position': (.7, .75)}
             ],
             'wooden_log': []
         }
