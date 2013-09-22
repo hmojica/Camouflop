@@ -68,11 +68,19 @@ class LevelsSystem(GameSystem):
         hole_position = (Window.size[0] * hole['position'][0], Window.size[1] * hole['position'][1])
         environment_system.add_hole(hole_position)
 
+    def add_wooden_logs(self, wooden_logs):
+        environment_system = self.gameworld.systems['environment_system']
+        for wooden_log in wooden_logs:
+            print wooden_log['position'][0]
+            log_position = (Window.size[0] * wooden_log['position'][0], Window.size[1] * wooden_log['position'][1])
+            environment_system.add_wooden_logs(log_position)
+
     def add_environments(self, level_map):
         self.add_trees(level_map['trees'])
         self.add_rocks(level_map['rocks'])
         self.add_clouds(level_map['clouds'])
         self.add_hole(level_map['hole'])
+        self.add_wooden_logs(level_map['wooden_log'])
 
     def get_window_position(self, position):
         return Window.size[0] * position[0], Window.size[1] * position[1]

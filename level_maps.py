@@ -23,7 +23,8 @@ class LevelMaps:
                 {'position': (.75, .86), 'type': 'small_rock'}
             ],
             'clouds': [],
-            'hole': {'position': (.90, .75)}
+            'hole': {'position': (.90, .75)},
+            'wooden_log': [{'position': (.5, .8)}]
         },
         #level 2
         {

@@ -154,6 +154,26 @@ class EnvironmentSystem(GameSystem):
         component_order = ['cymunk-physics', 'physics_renderer2', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
+    def get_wooden_log_renderer(self, type):
+        if type == 'log':
+            return {'texture': 'assets/environment/Log.png', 'size': (93, 179)}
+
+    def add_wooden_logs(self, position, type='log'):
+        x = position[0]
+        y = position[1]
+        renderer = self.get_wooden_log_renderer(type)
+        size = renderer['size']
+        shape_dict = {'width': size[0]*.80, 'height': size[1]*.8, 'mass': 100}
+        col_shape_dict = {'shape_type': 'box', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict,
+                          'friction': 1.0}
+        physics_component_dict = {'main_shape': 'box', 'velocity': (0, 0), 'position': (x, y),
+                                  'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
+                                  'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
+        create_component_dict = {'cymunk-physics': physics_component_dict,
+                                 'physics_renderer': renderer,}
+        component_order = ['cymunk-physics', 'physics_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
     def clear_objects(self):
         for entity_id in self.entity_ids:
             Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
