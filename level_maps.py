@@ -31,7 +31,6 @@ class LevelMaps:
             'dark_bunny': {'position': (.8, .8)},
             'white_bunnies': [
                 {'position': (.1, .6)},
-                {'position': (.1, .05)},
                 {'position': (.9, .05)}
             ],
             'trees': [
