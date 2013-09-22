@@ -41,6 +41,7 @@ class RabbitSystem(GameSystem):
             self.dead_rabbits = True
             if self.rabbit == self.targeted:
                 self.rabbit = None
+                self.gameworld.parent.set_game_over()
                 sound_system = self.gameworld.systems['sound_system']
                 Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_victory'))
             elif self.targeted in self.white_rabbits:

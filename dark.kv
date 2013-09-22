@@ -1,5 +1,4 @@
 #:kivy 1.8.0
-
 DarkBunnyGame:
 
 <DarkBunnyGame>:
@@ -30,6 +29,7 @@ DarkBunnyGame:
 			map_size: root.size
 			gameworld: root.gameworld
 		MusicController:
+			volume: app.music_level
             id: music_controller
         QuadTreePointRenderer:
 			system_id: 'quadtree_renderer'
@@ -78,6 +78,7 @@ DarkBunnyGame:
 		LevelsSystem:
 		    gameworld: root.gameworld
 	    SoundSystem:
+	    	volume: app.sound_level
 	        system_id: 'sound_system'
 	        gameworld: root.gameworld
 		GameScreenManager:
@@ -86,19 +87,207 @@ DarkBunnyGame:
 			pos: root.pos
 			gameworld: root.gameworld
 
-
 <GameScreenManager>:
+	MainMenuScreen:
+		id: menu_screen
 	MainScreen:
 		id: main_screen
+	SettingsScreen:
+		id: setting_screen
+	GameOverScreen:
+		id: gameover
+	PauseScreen:
+		id: pause
+	CreditScreen:
+		id: credits
 	
 <MainScreen@GameScreen>:
 	name: 'main'
 	FloatLayout:
 		BoxLayout:
 			size_hint: (.2, .1)
-			pos_hint: {'x': .4, 'y': .1}
+			pos_hint: {'x': 0., 'y': 0.}
 			orientation: 'vertical'
 			DebugPanel:
+			CamouflopButton2:
+				text: 'Pause Game'
+				on_press: app.root.pause_game()
+
+<PauseScreen@GameScreen>:
+	name: 'pause'
+	BoxLayout:
+		size_hint: (.6, .6)
+		pos_hint: {'x': .2, 'y': .2}
+		CamouflopButton:
+			text: 'Resume Game'
+			on_press: app.root.start_game()
+
+<CreditScreen@GameScreen>:
+	name: 'credits'
+	BoxLayout:
+		size_hint: (.6, .8)
+		pos_hint: {'x': .2, 'y': .1}
+		orientation: 'vertical'
+		CamouflopLabel:
+			text: 'David Coleman'
+		CamouflopLabel:
+			text: 'Isaac Kingston'
+		CamouflopLabel:
+			text: 'Adair Kovac'
+		CamouflopLabel:
+			text: 'Jacob Kovac'
+		CamouflopLabel:
+			text: 'Hector Mojica'
+		CamouflopLabel:
+			text: 'Akshay Thakre'
+		CamouflopButton:
+			text: 'Return to Main Menu'
+			on_press: app.root.set_state()
+
+<CamouflopLabel@Label>:
+	font_name: 'assets/ui_elements/TEMPSITC.TTF'
+	font_size: 30
+	color: (0., 0., 0., 1.)
+
+<MainMenuScreen@GameScreen>:
+	name: 'menu'
+	FloatLayout:
+		size: root.size
+		pos: root.pos
+		MainMenu:
+
+<SliderSetting@Widget>:
+	slider_name: self.slider_name
+	slider_value: setting_slider.value
+	BoxLayout:
+		size: root.size
+		pos: root.pos
+		orientation: 'horizontal'
+		Label:
+			size_hint: (.5, 1.0)
+			font_name: 'assets/ui_elements/TEMPSITC.TTF'
+			font_size: 30
+			text: root.slider_name
+			color: (0., 0., 0., 1.)
+		Slider:
+			size_hint: (.5, 1.0)
+			id: setting_slider
+			min: 0.
+			max: 1.
+			step: .01
+			value: 1.
+			canvas.before:
+				Color:
+					rgba: (0., 0., 0., 1.)
+				Rectangle:
+					size: self.size[0], self.size[1]*.1
+					pos: self.pos[0], self.pos[1] + self.size[1]*.45
+
+<SettingsScreen@GameScreen>:
+	name: 'settings'
+	BoxLayout:
+		size_hint: (.6, .8)
+		pos_hint: {'x': .2, 'y': .1}
+		orientation: 'vertical'
+		SliderSetting:
+			slider_name: 'Music Volume'
+			on_slider_value: app.music_level = self.slider_value
+		SliderSetting:
+			slider_name: 'Sound Volume'
+			on_slider_value: app.sound_level = self.slider_value
+		BoxLayout:
+			orientation: 'horizontal'
+			CamouflopButton:
+				text: 'Return to Main Menu'
+				on_press: app.root.set_state()
+
+<GameOverScreen@GameScreen>:
+	name: 'gameover'
+	BoxLayout:
+		size_hint: (.6, .6)
+		pos_hint: {'x': .2, 'y': .2}
+		CamouflopButton:
+			text: 'Return to Main Menu'
+			on_press: app.root.set_state()
+
+
+<-CamouflopButton@Button>:
+	font_name: 'assets/ui_elements/TEMPSITC.TTF'
+	font_size: 40
+	canvas:
+		Color:
+			rgba: (1., 1. ,1., 1.) if root.state == 'normal' else (0., 0., 0., 1.)
+		Rectangle:
+			size: root.size
+			pos: root.pos
+		Color:
+			rgba: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		Line:
+			rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1])
+			width: 2.0
+
+	Label:
+		text: root.text
+		font_size: root.font_size
+		font_name: root.font_name
+		color: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		size: root.size
+		pos: root.pos
+
+<-CamouflopButton2@Button>:
+	font_name: 'assets/ui_elements/TEMPSITC.TTF'
+	font_size: 20
+	canvas:
+		Color:
+			rgba: (1., 1. ,1., 1.) if root.state == 'normal' else (0., 0., 0., 1.)
+		Rectangle:
+			size: root.size
+			pos: root.pos
+		Color:
+			rgba: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		Line:
+			rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1])
+			width: 2.0
+
+	Label:
+		text: root.text
+		font_size: root.font_size
+		font_name: root.font_name
+		color: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		size: root.size
+		pos: root.pos
+
+
+<MainMenu@Widget>:
+	title_image: title_image
+	BoxLayout:
+		size: root.size
+		pos: root.pos
+		orientation: 'vertical'
+		Image:
+			id: title_image
+			source: 'assets/ui_elements/CamouflopLogo.png'
+		BoxLayout:
+			orientation: 'vertical'
+			Widget:
+				size_hint: (1., .05)
+			BoxLayout:
+				size_hint: (1., .25)
+				padding: 10
+				spacing: 10
+				CamouflopButton:
+					text: 'Play Game'
+					on_press: app.root.start_game()
+				CamouflopButton:
+					text: 'Settings'
+					on_press: app.root.open_settings()
+				CamouflopButton:
+					text: 'Credits'
+					on_press: app.root.open_credits()
+			Widget:
+				size_hint: (1., .7)
+
+
 
 <DebugPanel>:
     Label:

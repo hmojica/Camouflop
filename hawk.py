@@ -152,7 +152,7 @@ class HawkAISystem(GameSystem):
         systems = gameworld.systems
         rabbit_system = systems['rabbit_system']
         current_player_character_id = rabbit_system.targeted
-        if current_player_character_id:
+        if current_player_character_id != None:
             current_player_character = entities[current_player_character_id]
             if 'cymunk-physics' in current_player_character:
                 target_physics_data = current_player_character['cymunk-physics']
@@ -161,8 +161,10 @@ class HawkAISystem(GameSystem):
                 velocity *= dt
                 target_position += velocity
                 return target_position
-
-        return None
+            else: 
+                return None
+        else:
+            return None
 
     def update(self, dt):
         gameworld = self.gameworld

@@ -1,5 +1,5 @@
 from kivy.clock import Clock
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.properties import StringProperty, BooleanProperty, NumericProperty
 import random
 from kivy.core.audio import SoundLoader
 from kivy.uix.widget import Widget
@@ -8,6 +8,7 @@ from kivent_cython import (GameSystem)
 
 class SoundSystem(GameSystem):
     sound_dir = StringProperty('assets/sound_fx/')
+    volume = NumericProperty(1.)
 
     def __init__(self, **kwargs):
         super(SoundSystem, self).__init__(**kwargs)
@@ -15,7 +16,11 @@ class SoundSystem(GameSystem):
         self.sound_names = ['bunny_eats_something', 'bunny_powerup', 'hawk_diving',
         'hawk_diving', 'hawk_victory', 'rabbit', 'rabbit_in_snow', 'rabbit_on_ice',
         'rabbit_on_wood', 'rabbit_victory', 'white_rabbits', 'wind_in_the_background']
-        Clock.schedule_once(self.load_music)
+        self.load_music(0)
+
+    def on_volume(self, instance, value):
+        for track in self.sound_names:
+            self.sound_dict[track].volume = value
         
     def load_music(self, dt):
         sound_names = self.sound_names
@@ -50,12 +55,17 @@ class SoundSystem(GameSystem):
 class MusicController(Widget):
     music_dir = StringProperty('assets/music/')
     song_is_playing = BooleanProperty(False)
+    volume = NumericProperty(1.)
 
     def __init__(self, **kwargs):
         super(MusicController, self).__init__(**kwargs)
         self.music_dict = {}
         self.track_names = ['rabbittrack1']
-        Clock.schedule_once(self.load_music)
+        self.load_music(0)
+
+    def on_volume(self, instance, value):
+        for track in self.track_names:
+            self.music_dict[track].volume = value
         
     def load_music(self, dt):
         track_names = self.track_names
