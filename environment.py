@@ -8,9 +8,11 @@ class EnvironmentSystem(GameSystem):
 
     def get_tree_shadow_renderer(self, type):
         if type == 'small':
-            return {'texture':
-            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)}
-
+            return {'texture': 'assets/environment/GrnTreShadowSM2.png', 'size': (128, 122)}
+        if type == 'medium':
+            return {'texture': 'assets/environment/GrnTreShadowMD2.png', 'size': (156, 150)}
+        if type == 'large':
+            return {'texture': 'assets/environment/GrnTreShadowLG2.png', 'size': (198, 198)}
 
     def add_tree_shadow(self, position, type):
         x = position[0] + 50
@@ -74,7 +76,11 @@ class EnvironmentSystem(GameSystem):
 
     def get_tree_renderer(self, type):
         if type == 'small':
-            return {'texture': 'assets/environment/green_snow_tree.png', 'size': (80, 80)}
+            return {'texture': 'assets/environment/GrnSnwTreSM.png', 'size': (128, 128)}
+        if type == 'medium':
+            return {'texture': 'assets/environment/GrnSnwTreMD.png', 'size': (176, 176)}
+        if type == 'large':
+            return {'texture': 'assets/environment/GrnSnwTreLG.png', 'size': (224, 224)}
 
     def add_tree(self, position, type):
         x = position[0]
@@ -115,4 +121,14 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer,}
         component_order = ['cymunk-physics', 'physics_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def get_snowtexture_renderer(self, type):
+        if type == 'SnowBankA':
+            return {'texture': 'assets/environment/SnowBankA.png', 'size': (640, 400)}
+
+    def load_snowtexture(self, type, position):
+        create_component_dict = {'position': {'position': position},
+        'quadtree_renderer': self.get_snowtexture_renderer(type)}
+        component_order = ['position', 'quadtree_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)

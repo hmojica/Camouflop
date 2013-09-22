@@ -89,10 +89,13 @@ class DarkBunnyGame(Widget):
         environment_system.add_rock(rock_position5)
 
         cloud_position1 = (Window.size[0] * .30, Window.size[1] * .20)
-        environment_system.add_cloud(cloud_position1, 'large_feather', vel_max=50, ang_vel=-.15)
+        environment_system.add_cloud(cloud_position1, 'large_feather', vel_max=50)
 
         cloud_position2 = (Window.size[0] * .60, Window.size[1] * .80)
-        environment_system.add_cloud(cloud_position2, 'small_feather', vel_max=30, ang_vel=.1)
+        environment_system.add_cloud(cloud_position2, 'small_feather', vel_max=30)
+
+        snow_position1 = (Window.size[0] * .50, Window.size[1] * .50)
+        environment_system.load_snowtexture('SnowBankA', snow_position1)
 
 
 
