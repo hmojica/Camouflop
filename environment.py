@@ -114,10 +114,6 @@ class EnvironmentSystem(GameSystem):
         physics_component_dict = {'main_shape': 'circle', 'velocity': (0, 0), 'position': (x, y),
                                   'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
                                   'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
-        # create_component_dict = {'cymunk-physics': physics_component_dict,
-        #                          'physics_renderer': {'texture': 'assets/environment/rock.png', 'size': (50, 50)},
-        #                          'environment_system': {'type': 'rock'}}
-        # component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer,}
         component_order = ['cymunk-physics', 'physics_renderer']
