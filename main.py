@@ -52,10 +52,11 @@ class RabbitSystem(GameSystem):
         '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4': 
         'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
         'current_frame_time': 0., 'number_of_frames': 6}
-        rabbit_dicts['dark_bunny'] = {'outer_radius': 20, 'mass': 50, 'x': 100, 'y': 100,
+
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 20, 'mass': 50, 'x': Window.size[0]*.05, 'y': Window.size[1]/2.,
                                       'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer, 
                                       'anim_state': black_rabbit_anim_dict}
-        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': 100, 'y': 400,
+        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': Window.size[0]*.05, 'y': Window.size[1]/3.,
                                         'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
                                         'anim_state': white_rabbit_anim_dict}
 
@@ -316,7 +317,6 @@ class EnvironmentSystem(GameSystem):
             'green_snow_tree.png', 'size': (80, 80)},}
         component_order = ['cymunk-physics', 'tree_physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
-
 
 
 class DarkBunnyGame(Widget):
