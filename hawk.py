@@ -215,3 +215,7 @@ class HawkAISystem(GameSystem):
         'hawk_ai_system': hawk_ai_system}
         component_order = ['cymunk-physics', 'hawk_physics_renderer', 'hawk_ai_system']
         self.gameworld.init_entity(create_component_dict, component_order)
+
+    def clear_hawk(self):
+        for entity_id in self.entity_ids:
+            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
