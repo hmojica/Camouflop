@@ -30,68 +30,6 @@ class DarkBunnyGame(Widget):
             print 'failed: rescheduling init'
             Clock.schedule_once(self._init_game)
 
-    def add_hole(self):
-        position = [Window.size[0]*.95, Window.size[1]/2]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
-        'mass': 100, 'offset': (0, 0)}
-        col_shape = {'shape_type': 'circle', 'elasticity': .5,
-        'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
-        col_shapes = [col_shape]
-        physics_component = {'main_shape': 'circle',
-        'velocity': (0, 0),
-        'position': position, 'angle': 0,
-        'angular_velocity': 0,
-        'vel_limit': 250,
-        'ang_vel_limit': radians(200),
-        'mass': 0, 'col_shapes': col_shapes}
-        create_component_dict = {'cymunk-physics': physics_component,
-        'physics_renderer2': {'texture':
-            'assets/environment/RabbitHole.png', 'size': (80, 80)},}
-        component_order = ['cymunk-physics', 'physics_renderer2']
-        self.gameworld.init_entity(create_component_dict, component_order)
-
-    def add_rabbit(self):
-        systems = self.gameworld.systems
-        rabbit_system = systems['rabbit_system']
-        rabbit_system.add_rabbit('dark_bunny')
-        rabbit_system.add_rabbit('white_rabbit_1')
-
-    def add_environment(self):
-        systems = self.gameworld.systems
-
-        environment_system = systems['environment_system']
-        tree_position1 = (Window.size[0] * .5, Window.size[1] * .25)
-        environment_system.add_tree(tree_position1, 'small')
-
-        tree_position2 = (Window.size[0] * .25, Window.size[1] * .75)
-        environment_system.add_tree(tree_position2, 'small')
-
-        tree_position3 = (Window.size[0] * .75, Window.size[1] * .75)
-        environment_system.add_tree(tree_position3, 'small')
-
-        rock_position1 = (Window.size[0] * .90, Window.size[1] * .40)
-        environment_system.add_rock(rock_position1)
-
-        rock_position2 = (Window.size[0] * .85, Window.size[1] * .50)
-        environment_system.add_rock(rock_position2)
-
-        rock_position3 = (Window.size[0] * .55, Window.size[1] * .90)
-        environment_system.add_rock(rock_position3)
-
-        rock_position4 = (Window.size[0] * .55, Window.size[1] * .80)
-        environment_system.add_rock(rock_position4)
-
-        rock_position5 = (Window.size[0] * .55, Window.size[1] * .70)
-        environment_system.add_rock(rock_position5)
-
-        cloud_position1 = (Window.size[0] * .30, Window.size[1] * .20)
-        environment_system.add_cloud(cloud_position1, 'large_feather', vel_max=50, ang_vel=-.15)
-
-        cloud_position2 = (Window.size[0] * .60, Window.size[1] * .80)
-        environment_system.add_cloud(cloud_position2, 'small_feather', vel_max=30, ang_vel=.1)
-
-
-
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
