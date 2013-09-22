@@ -3,17 +3,18 @@ import math
 import hawk
 import boundary
 from kivy.app import App
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.uix.widget import Widget
 import kivent_cython
 from kivent_cython import GameSystem
 from kivy.clock import Clock
 from kivy.core.window import Window
-from math import radians, atan2, degrees, pi
+from math import radians, atan2, degrees, pi, ceil
 from functools import partial
 from random import randint
 from kivy.vector import Vector
 from kivy.core.image import Image as CoreImage
+from kivy.graphics import Rectangle
 
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
@@ -294,7 +295,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'shadow_renderer': {'texture':
-            'treeshadow.png', 'size': (200, 200)},}
+            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)},}
         component_order = ['cymunk-physics', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
@@ -315,13 +316,29 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'tree_physics_renderer': {'texture':
-            'green_snow_tree.png', 'size': (80, 80)},}
+            'assets/environment/green_snow_tree.png', 'size': (80, 80)},}
         component_order = ['cymunk-physics', 'tree_physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
+
+class BackgroundWidget(Widget):
+    def __init__(self, **kwargs):
+        super(BackgroundWidget, self).__init__(**kwargs)
+        Clock.schedule_once(self.setup_background)
+
+    def setup_background(self, dt):
+        size = Window.size
+        x_repeat_num = int(ceil(size[0]/256.))
+        y_repeat_num = int(ceil(size[1]/256.))
+        for x in xrange(x_repeat_num):
+            for y in xrange(y_repeat_num):
+                with self.canvas:
+                    Rectangle(pos=(256.*x, 256.*y), size=(256, 256), source='assets/environment/snow_texture.png')
+
 
 
 
 class DarkBunnyGame(Widget):
+    bg_texture = ObjectProperty(None)
     
     def __init__(self, **kwargs):
         super(DarkBunnyGame, self).__init__(**kwargs)
@@ -365,8 +382,9 @@ class DarkBunnyGame(Widget):
         systems = self.gameworld.systems
         environment_system = systems['environment_system']
         tree_position = (300, 150)
+        tree_shadow_position = (325, 125)
         environment_system.add_tree(tree_position)
-        environment_system.add_tree_shadow(tree_position)
+        environment_system.add_tree_shadow(tree_shadow_position)
 
 
     def init_game(self, dt):
