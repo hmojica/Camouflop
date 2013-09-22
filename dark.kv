@@ -17,6 +17,7 @@ DarkBunnyGame:
 		gamescreenmanager: gamescreenmanager
 		hawk_ai_system: hawk_ai_system
 		boundary_system: boundary_system
+		environment_system: environment_system
 		music_controller: music_controller
 		GameView:
 			focus_entity: False
@@ -62,10 +63,13 @@ DarkBunnyGame:
 			updateable: True
 			update_time: 1./30.
 		EnvironmentSystem:
+		    id: environment_system
 		    gameworld: root.gameworld
 		AnimationSystem:
 			gameworld: root.gameworld
 			updateable: True
+		LevelsSystem:
+		    gameworld: root.gameworld
 	    SoundSystem:
 	        system_id: 'sound_system'
 	        gameworld: root.gameworld

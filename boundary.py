@@ -29,4 +29,3 @@ class BoundarySystem(GameSystem):
         self.add_boundary(gamescreen_height, 5, (gamescreen_width, gamescreen_height/2))
         #top bounding box
         self.add_boundary(5, gamescreen_width, (gamescreen_width/2, gamescreen_height))
-

@@ -1,5 +1,6 @@
+from math import radians
 from kivy.properties import StringProperty
-from kivent_cython import GameSystem
+from kivent_cython import GameSystem, Clock, partial
 
 
 
@@ -29,8 +30,8 @@ class EnvironmentSystem(GameSystem):
         'ang_vel_limit': 0,
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
-        'shadow_renderer': shadow_renderer}
-        component_order = ['cymunk-physics', 'shadow_renderer']
+        'shadow_renderer': shadow_renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'shadow_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def get_cloud_renderer(self, type):
@@ -59,8 +60,8 @@ class EnvironmentSystem(GameSystem):
         'ang_vel_limit': ang_vel_max,
         'mass': 100, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
-        'hawk_physics_renderer': renderer,}
-        component_order = ['cymunk-physics', 'hawk_physics_renderer']
+        'hawk_physics_renderer': renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'hawk_physics_renderer', 'environment_system']
         cloud_id = self.gameworld.init_entity(create_component_dict, component_order)
         cloud = self.gameworld.entities[cloud_id]
         physics_data = cloud['cymunk-physics']
@@ -93,8 +94,8 @@ class EnvironmentSystem(GameSystem):
         'ang_vel_limit': 0,
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
-        'tree_physics_renderer': physics_renderer,}
-        component_order = ['cymunk-physics', 'tree_physics_renderer']
+        'tree_physics_renderer': physics_renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'tree_physics_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
         self.add_tree_shadow(position, type)
 
@@ -108,7 +109,8 @@ class EnvironmentSystem(GameSystem):
         renderer = self.get_rock_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': renderer['size'][0]/2.,
         'mass': 100, 'offset': (0, 0)}
-        col_shape_dict = {'shape_type': 'circle', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shape_dict = {'shape_type': 'circle', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict,
+                          'friction': 1.0}
         physics_component_dict = {'main_shape': 'circle', 'velocity': (0, 0), 'position': (x, y),
                                   'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
                                   'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
@@ -116,3 +118,26 @@ class EnvironmentSystem(GameSystem):
                                  'physics_renderer': renderer,}
         component_order = ['cymunk-physics', 'physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
+
+    def add_hole(self, position):
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .5,
+        'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+        'velocity': (0, 0),
+        'position': position, 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': 250,
+        'ang_vel_limit': radians(200),
+        'mass': 0, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'physics_renderer2': {'texture':
+            'assets/environment/RabbitHole.png', 'size': (80, 80)}, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'physics_renderer2', 'environment_system']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def clear_objects(self):
+        for entity_id in self.entity_ids:
+            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
