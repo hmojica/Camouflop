@@ -193,9 +193,12 @@ class RabbitSystem(GameSystem):
         body.angle = (rotation) - pi
         body.angular_velocity = 0
         unit_vector = body.rotation_vector
-        force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
-        acceleration = rabbit['rabbit_system']['acceleration']         
-        force = acceleration *unit_vector[0], acceleration *unit_vector[1]
+        rabbit_type = rabbit['rabbit_system']['rabbit_type']
+        rabbit_info = self.rabbit_dicts[rabbit_type]
+        outer_radius = rabbit_info['outer_radius']
+        force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
+        acceleration = rabbit['rabbit_system']['acceleration']
+        force = acceleration * unit_vector[0], acceleration * unit_vector[1]
         body.apply_force(force, force_offset)
 
     def stop_rabbit(self, rabbit_entity):
