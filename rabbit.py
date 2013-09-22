@@ -162,7 +162,7 @@ class RabbitSystem(GameSystem):
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
         rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
-                         'shadow_count': 0}
+                         'shadow_count': 0, 'acceleration': 1000}
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system,
         'animation_system': animation_system}
@@ -194,7 +194,8 @@ class RabbitSystem(GameSystem):
         body.angular_velocity = 0
         unit_vector = body.rotation_vector
         force_offset = unit_vector[0] * -1 * 32, unit_vector[1] * -1 * 32
-        force = 1000*unit_vector[0], 1000*unit_vector[1]
+        acceleration = rabbit['rabbit_system']['acceleration']         
+        force = acceleration *unit_vector[0], acceleration *unit_vector[1]
         body.apply_force(force, force_offset)
 
     def stop_rabbit(self, rabbit_entity):
