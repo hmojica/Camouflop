@@ -26,7 +26,7 @@ class LevelMaps:
 		{'position': (.3, .2), 'type': 'med_rock'},
             ],
             'clouds': [],
-            'hole': {'position': (.90, .25)},
+            'holes': [{'position': (.90, .25)}],
             'wooden_log': []	
 	},
         #level 1
@@ -52,7 +52,7 @@ class LevelMaps:
                 {'position': (.75, .86), 'type': 'small_rock'}
             ],
             'clouds': [],
-            'hole': {'position': (.90, .75)},
+            'holes': [{'position': (.90, .75)}],
             'wooden_log': [{'position': (.5, .8)}]
         },
         #level 2
@@ -78,7 +78,7 @@ class LevelMaps:
             'clouds': [
                 {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
             ],
-            'hole': {'position': (.1, .9)},
+            'holes': [{'position': (.1, .9)}],
             'wooden_log': []
         },
         #level 3
@@ -103,7 +103,7 @@ class LevelMaps:
                 {'position': (.3, .2), 'type': 'large_feather', 'vel_max': 50, 'ang_vel': -.15},
                 {'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}
             ],
-            'hole': {'position': (.95, .5)},
+            'holes': [{'position': (.95, .5)}],
             'wooden_log': []
         }
     ]
