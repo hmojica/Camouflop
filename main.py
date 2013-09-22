@@ -185,7 +185,7 @@ class RabbitSystem(GameSystem):
         if not called_rabbit is None:
             if called_rabbit == self.rabbit:
                 self.stop_rabbit(self.gameworld.entities[called_rabbit])
-            else:
+            elif self.rabbit is not None:
                 self.call_rabbit(called_rabbit)
         elif self.rabbit is not None:
             rabbit = self.gameworld.entities[self.rabbit]
