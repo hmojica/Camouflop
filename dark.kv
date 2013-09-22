@@ -17,6 +17,7 @@ DarkBunnyGame:
 		gamescreenmanager: gamescreenmanager
 		hawk_ai_system: hawk_ai_system
 		boundary_system: boundary_system
+		music_controller: music_controller
 		GameView:
 			focus_entity: False
 			updateable: False
@@ -27,6 +28,8 @@ DarkBunnyGame:
 			system_id: 'map'
 			map_size: root.size
 			gameworld: root.gameworld
+		MusicController:
+            id: music_controller
 		CymunkPhysics:
 			gameworld: root.gameworld
 			damping: .9
@@ -63,6 +66,9 @@ DarkBunnyGame:
 		AnimationSystem:
 			gameworld: root.gameworld
 			updateable: True
+	    SoundSystem:
+	        system_id: 'sound_system'
+	        gameworld: root.gameworld
 		GameScreenManager:
 			id: gamescreenmanager
 			size: root.size

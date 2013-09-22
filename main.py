@@ -5,6 +5,7 @@ import boundary
 import rabbit
 import animation
 import environment
+import sound
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty, ListProperty
 from kivy.uix.widget import Widget
@@ -173,6 +174,7 @@ class DarkBunnyGame(Widget):
         self.add_hole()
         self.add_environment()
         self.setup_collision_callbacks()
+        self.gameworld.music_controller.play_new_song(30)
 
 
 class DebugPanel(Widget):
