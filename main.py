@@ -361,9 +361,13 @@ class DarkBunnyGame(Widget):
     def add_environment(self):
         systems = self.gameworld.systems
         environment_system = systems['environment_system']
-        tree_position = (Window.size[0] * 3/8, Window.size[1] * 1/4)
-        environment_system.add_tree(tree_position)
-        environment_system.add_tree_shadow(tree_position)
+        tree_position1 = (Window.size[0] * .5, Window.size[1] * 1/4)
+        environment_system.add_tree(tree_position1)
+        environment_system.add_tree_shadow(tree_position1)
+
+        tree_position2 = (Window.size[0] * .25, Window.size[1] * .75)
+        environment_system.add_tree(tree_position2)
+        environment_system.add_tree_shadow(tree_position2)
 
     def init_game(self, dt):
         self.setup_states()
