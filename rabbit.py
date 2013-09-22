@@ -28,7 +28,7 @@ class RabbitSystem(GameSystem):
             if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
                 self.targeted = rabbit_entity['id']
                 sound_system = self.gameworld.systems['sound_system']
-                Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_diving'))
+                Clock.schedule_once(partial(sound_system.schedule_play, 'hawkcry'))
             if self.targeted is not None:
                 if 'rabbit_system' in entities[self.targeted]:
                     if entities[self.targeted]['rabbit_system']['visibility'] < 800:
@@ -149,7 +149,7 @@ class RabbitSystem(GameSystem):
 
     def get_rabbit_dict(self, rabbit_type):
         if rabbit_type == 'white_rabbit':
-            white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            white_rabbit_physics_renderer = dict(texture='assets/white_rabbit/WR1.png', size=(64, 64))
             white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
             '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
             'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
@@ -159,7 +159,7 @@ class RabbitSystem(GameSystem):
                     'physics_renderer': white_rabbit_physics_renderer,
                     'anim_state': white_rabbit_anim_dict}
         else:
-            dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            dark_bunny_physics_renderer = dict(texture='assets/black_rabbit/BR1.png', size=(64, 64))
             black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
                 '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
                 'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
@@ -218,20 +218,21 @@ class RabbitSystem(GameSystem):
             self.white_rabbits.append(entity_id)
 
     def on_touch_down(self, touch):
-        called_rabbit = self.touch_rabbit(touch)
-        if not called_rabbit is None:
-            if called_rabbit == self.rabbit:
-                self.stop_rabbit(self.gameworld.entities[called_rabbit])
+        if self.gameworld.state == 'main':
+            called_rabbit = self.touch_rabbit(touch)
+            if not called_rabbit is None:
+                if called_rabbit == self.rabbit:
+                    self.stop_rabbit(self.gameworld.entities[called_rabbit])
+                elif self.rabbit is not None:
+                    self.call_rabbit(called_rabbit)
+                    sound_system = self.gameworld.systems['sound_system']
+                    Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'))
             elif self.rabbit is not None:
-                self.call_rabbit(called_rabbit)
-                sound_system = self.gameworld.systems['sound_system']
-                Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'))
-        elif self.rabbit is not None:
-            rabbit = self.gameworld.entities[self.rabbit]
-            rabbit_position = rabbit['cymunk-physics']['position']
-            XDistance =  (rabbit_position[0]) - touch.x
-            YDistance =  (rabbit_position[1]) - touch.y
-            self.apply_rabbit_force(rabbit, XDistance, YDistance)
+                rabbit = self.gameworld.entities[self.rabbit]
+                rabbit_position = rabbit['cymunk-physics']['position']
+                XDistance =  (rabbit_position[0]) - touch.x
+                YDistance =  (rabbit_position[1]) - touch.y
+                self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
     def apply_rabbit_force(self, rabbit, XDistance, YDistance):
         self.stop_rabbit(rabbit)

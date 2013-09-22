@@ -15,7 +15,8 @@ class SoundSystem(GameSystem):
         self.sound_dict = {}
         self.sound_names = ['bunny_eats_something', 'bunny_powerup', 'hawk_diving',
         'hawk_diving', 'hawk_victory', 'rabbit', 'rabbit_in_snow', 'rabbit_on_ice',
-        'rabbit_on_wood', 'rabbit_victory', 'white_rabbits', 'wind_in_the_background']
+        'rabbit_on_wood', 'rabbit_victory', 'white_rabbits', 'wind_in_the_background', 
+        'hawkcry']
         self.load_music(0)
 
     def on_volume(self, instance, value):

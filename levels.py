@@ -18,6 +18,7 @@ class LevelsSystem(GameSystem):
     current_level_id = NumericProperty(0)
 
     def clear_level(self, dt):
+        self.gameworld.parent.state = 'pause'
         self.clear_gameworld_objects()
         self.cleared = False
         Clock.schedule_once(self.check_clear)
