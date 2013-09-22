@@ -90,6 +90,7 @@ class RabbitSystem(GameSystem):
                 time_offset = 0
             else:
                 time_offset = 10
+        Clock.schedule_once(gameworld.systems['levels_system'].clear_level, time_offset) 
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
         if self.rabbit == None and self.white_rabbits == []:
