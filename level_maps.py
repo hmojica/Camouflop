@@ -1,34 +1,6 @@
 class LevelMaps:
     levels = [
-	#new level
-	{
-	    'dark_bunny': {'position': (.5, .5)},
-            'white_bunnies': [
-                {'position': (.1, .7)},
- 		{'position': (.3, .3)},
-		{'position': (.7, .7)}
-            ],
-            'trees': [
-                {'position': (.4, .2), 'type': 'small_tree'},
-                {'position': (.6, .4), 'type': 'small_tree'},
-		{'position': (.4, .4), 'type': 'small_tree'}
-                
-            ],
-            'rocks': [
-                {'position': (.1, .6), 'type': 'large_rock'},
-                {'position': (.2, .6), 'type': 'large_rock'},
-                {'position': (.3, .6), 'type': 'med_rock'},
-                {'position': (.4, .5), 'type': 'large_rock'},
-		{'position': (.4, .4), 'type': 'med_rock'},
-		{'position': (.5, .3), 'type': 'med_rock'},
-		{'position': (.6, .6), 'type': 'med_rock'},
-		{'position': (.6, .5), 'type': 'med_rock'}
-            ],
-            'clouds': [],
-            'hole': {'position': (.9, .1)},
-            'wooden_log': []	
-	},
-	#level 4
+	#level 0
 	{
 	    'dark_bunny': {'position': (.9, .145)},
             'white_bunnies': [
@@ -54,7 +26,7 @@ class LevelMaps:
 		{'position': (.3, .2), 'type': 'med_rock'},
             ],
             'clouds': [],
-            'hole': {'position': (.90, .25)},
+            'holes': [{'position': (.90, .25)}],
             'wooden_log': []	
 	},
         #level 1
@@ -80,7 +52,7 @@ class LevelMaps:
                 {'position': (.75, .86), 'type': 'small_rock'}
             ],
             'clouds': [],
-            'hole': {'position': (.90, .75)},
+            'holes': [{'position': (.90, .75)}],
             'wooden_log': [{'position': (.5, .8)}]
         },
         #level 2
@@ -106,7 +78,7 @@ class LevelMaps:
             'clouds': [
                 {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
             ],
-            'hole': {'position': (.1, .9)},
+            'holes': [{'position': (.1, .9)}],
             'wooden_log': []
         },
         #level 3
@@ -131,7 +103,59 @@ class LevelMaps:
                 {'position': (.3, .2), 'type': 'large_feather', 'vel_max': 50, 'ang_vel': -.15},
                 {'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}
             ],
-            'hole': {'position': (.95, .5)},
+            'holes': [{'position': (.95, .5)}],
+            'wooden_log': []
+        },
+        #level 4
+        {
+            'dark_bunny': {'position': (.5, .5)},
+                'white_bunnies': [
+                    {'position': (.1, .7)},
+            {'position': (.3, .3)},
+            {'position': (.7, .7)}
+                ],
+                'trees': [
+                    {'position': (.4, .2), 'type': 'small_tree'},
+                    {'position': (.6, .4), 'type': 'small_tree'},
+            {'position': (.4, .4), 'type': 'small_tree'}
+
+                ],
+                'rocks': [
+                    {'position': (.1, .6), 'type': 'large_rock'},
+                    {'position': (.2, .6), 'type': 'large_rock'},
+                    {'position': (.3, .6), 'type': 'med_rock'},
+                    {'position': (.4, .5), 'type': 'large_rock'},
+            {'position': (.4, .4), 'type': 'med_rock'},
+            {'position': (.5, .3), 'type': 'med_rock'},
+            {'position': (.6, .6), 'type': 'med_rock'},
+            {'position': (.6, .5), 'type': 'med_rock'}
+                ],
+                'clouds': [],
+                'holes': [{'position': (.9, .1)}],
+                'wooden_log': []
+        },
+        #level 5
+        {
+            'dark_bunny': {'position': (.9, .9)},
+            'white_bunnies': [
+                {'position': (.1, .125)},
+                {'position': (.1, .25)},
+                {'position': (.1, .375)},
+                {'position': (.1, .5)},
+                {'position': (.1, .625)},
+                {'position': (.1, .75)}
+            ],
+            'trees': [],
+            'rocks': [],
+            'clouds':[],
+            'holes': [
+                {'position': (.7, .125)},
+                {'position': (.9, .25)},
+                {'position': (.8, .375)},
+                {'position': (.7, .5)},
+                {'position': (.9, .625)},
+                {'position': (.7, .75)}
+            ],
             'wooden_log': []
         }
     ]
