@@ -5,6 +5,8 @@ from kivy.clock import Clock
 from functools import partial
 from kivy.vector import Vector
 import math
+from kivy.core.window import Window
+from random import random
 
 class HawkAISystem(GameSystem):
     updateable = BooleanProperty(True)
@@ -85,21 +87,21 @@ class HawkAISystem(GameSystem):
             unit_vector = physics_data['unit_vector']
             target_position = self.target_player(dt)
             if target_position == None:
-                target_position = position
+                size = Window.size
+                target_position = (random()*size[0], random()*size[1])
             dist = Vector(target_position).distance(position)
             if dist > follow_distance and system_data['ai_state'] == 'flee': 
                 system_data['ai_state'] = 'follow'
-            if dist < 100 and system_data['ai_state'] == 'follow':
+            if dist < 5 and system_data['ai_state'] == 'follow':
                 system_data['ai_state'] = 'flee'
             desired_vector = self.calculate_desired_vector(target_position, 
                 position, system_data)
             desired_vector *= 1.5
-            avoidance_vector = self.avoid_obstacles_vector(entity_id, position)
-            avoidance_vector *= .25
-            desired_vector = (desired_vector + avoidance_vector)
+            #avoidance_vector = self.avoid_obstacles_vector(entity_id, position)
+            #avoidance_vector *= .25
+            #desired_vector = (desired_vector + avoidance_vector)
             steering_vector = desired_vector - Vector(velocity)
             self.steer(steering_vector, entity)
-
 
     def steer(self, target_vector, entity):
         physics_data = entity['cymunk-physics']
@@ -156,7 +158,7 @@ class HawkAISystem(GameSystem):
             target_position = Vector(target_physics_data['position'])
             velocity = Vector(target_physics_data['body'].velocity)
             velocity *= dt
-            target_position+= velocity
+            target_position += velocity
             return target_position
         else:
             return None
@@ -190,12 +192,12 @@ class HawkAISystem(GameSystem):
 
     def spawn_hawk(self, position):
         mass = 100
-        max_speed = 25000
-        acceleration = 25000
+        max_speed = 200
+        acceleration = 5000
         offset_distance = 10
         angular_acceleration = 10
-        hawk_width = 100
-        hawk_height = 100
+        hawk_width = 172
+        hawk_height = 86
         box_dict = {'width': hawk_width, 'height': hawk_height,
          'mass': mass}
         col_shape_dict = {'shape_type': 'box', 'elasticity': .5,
@@ -209,7 +211,7 @@ class HawkAISystem(GameSystem):
         'is_turning': 'zero',
         'turn_speed_multiplier': 0, 'engine_speed_multiplier': 0}
         create_component_dict = {'cymunk-physics': physics_component_dict,
-        'hawk_physics_renderer': {'texture': 'hawk.png', 'size': (hawk_width, hawk_height)},
+        'hawk_physics_renderer': {'texture': 'assets/hawk/HawkLG.png', 'size': (hawk_width, hawk_height)},
         'hawk_ai_system': hawk_ai_system}
         component_order = ['cymunk-physics', 'hawk_physics_renderer', 'hawk_ai_system']
         self.gameworld.init_entity(create_component_dict, component_order)

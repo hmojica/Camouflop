@@ -33,7 +33,7 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, -1)
             else:
                 self.change_visibility(entity_id, 2)
-            if rabbit_entity['rabbit_system']['visibility'] > 100 and self.targeted is None:
+            if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
                 self.target(rabbit_entity)
 
     def target(self, rabbit_entity):
@@ -301,35 +301,6 @@ class AnimationSystem(GameSystem):
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
 
-    # def add_hollow_log(self, position, angle):
-    #     x = position[0]
-    #     y = position[1]
-    #     shape_dict = {'width': 69, 'height': 128,
-    #     'mass': 100,}
-    #     col_shape = {'shape_type': 'box', 'elasticity': .5,
-    #     'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
-    #     col_shapes = [col_shape]
-    #     physics_component = {'main_shape': 'circle',
-    #     'velocity': (0, 0),
-    #     'position': (x, y), 'angle': angle,
-    #     'angular_velocity': 0,
-    #     'vel_limit': 0,
-    #     'ang_vel_limit': 0,
-    #     'mass': 0, 'col_shapes': col_shapes}
-    #     create_component_dict = {'cymunk-physics': physics_component,
-    #     'tree_physics_renderer': {'texture':
-    #         'assets/environment/Passable_Log_Closed.png', 'size': (86, 160)},}
-    #     component_order = ['cymunk-physics', 'tree_physics_renderer']
-    #     self.gameworld.init_entity(create_component_dict, component_order)
-    #
-    # def add_passable_log(self, center, angle):
-    #     self.add_hollow_log(center, angle)
-    #     boundary_system = self.gameworld.systems['boundary_system']
-    #     half_width = 36
-    #     boundary_system.add_boundary(1, 128, (center[0] + 36*cos(angle), center[1]-36*sin(angle)), angle)
-    #     boundary_system.add_boundary(1, 128, (center[0] - 36*cos(angle), center[1]+36*sin(angle)), angle)
-
-
     def add_tree_shadow(self, position):
         x = position[0]
         y = position[1]
@@ -434,8 +405,6 @@ class DarkBunnyGame(Widget):
         tree_shadow_position = (325, 125)
         environment_system.add_tree(tree_position)
         environment_system.add_tree_shadow(tree_shadow_position)
-        environment_system.add_passable_log((400, 400), 30)
-
 
     def init_game(self, dt):
         self.setup_states()
