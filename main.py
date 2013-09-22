@@ -19,6 +19,7 @@ class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
     white_rabbits = []
+    targeted = None
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
@@ -31,6 +32,22 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, -1)
             else:
                 self.change_visibility(entity_id, 2)
+            if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
+                self.target(rabbit_entity)
+
+    def target(self, rabbit_entity):
+        self.targeted = rabbit_entity['id']
+        Clock.schedule_once(self.attack, 15.)
+
+    def attack(self, dt):
+        if self.targeted is None:
+            return
+        Clock.schedule_once(partial(self.gameworld.timed_remove_entity, self.targeted))
+        if self.rabbit == self.targeted:
+            self.rabbit = None
+        elif self.targeted in self.white_rabbits:
+            self.white_rabbits.remove(self.targeted)
+        self.targeted = None
 
 
     def change_visibility(self, rabbit_id, amount):
@@ -76,11 +93,13 @@ class RabbitSystem(GameSystem):
         return False
 
     def enter_shadow(self, space, arbiter):
+        print 'start of begin'
         rabbit_id = arbiter.shapes[0].body.data
         rabbit_entity = self.gameworld.entities[rabbit_id]
         rabbit_entity['rabbit_system']['shadow_count'] += 1
         is_black = rabbit_id == self.rabbit
         self.update_is_safe(rabbit_entity, is_black)
+        print 'calling begin'
         return False
 
     def update_is_safe(self, rabbit_entity, is_black):
@@ -89,8 +108,11 @@ class RabbitSystem(GameSystem):
             or (rabbit_system['shadow_count'] == 0 and not is_black)
         if has_camouflage:
             rabbit_system['is_safe'] = True
+            print [rabbit_entity, ' is safe', rabbit_system['visibility']]
         elif not rabbit_system['in_log']:
             rabbit_system['is_safe'] = False
+            print [rabbit_entity, ' is in danger', rabbit_system['visibility']]
+
 
 
     def leave_shadow(self, space, arbiter):
@@ -146,7 +168,8 @@ class RabbitSystem(GameSystem):
         'mass': 50, 'col_shapes': col_shapes}
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
-        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': False, 'in_log': False,
+        is_safe = not rabbit_type == 'dark_bunny'
+        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
                          'shadow_count': 0}
         create_component_dict = {'cymunk-physics': physics_component, 
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system, 
@@ -280,7 +303,7 @@ class EnvironmentSystem(GameSystem):
     def add_tree_shadow(self, position):
         x = position[0]
         y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        shape_dict = {'inner_radius': 0, 'outer_radius': 100,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
@@ -421,6 +444,7 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
         physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(10,4,begin_func=self.no_impact_collision)
         physics.add_collision_handler(1,4, begin_func=rabbit_system.enter_shadow,
                                       separate_func=rabbit_system.leave_shadow)
         physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
