@@ -80,7 +80,7 @@ class RabbitSystem(GameSystem):
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
         if self.rabbit == rabbit_id:
             self.rabbit = None
-            Clock.schedule_once(gameworld.systems['levels_system'].generate_next_level)
+            Clock.schedule_once(gameworld.systems['levels_system'].clear_level)
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
         return False
