@@ -1,4 +1,5 @@
 #:kivy 1.8.0
+
 DarkBunnyGame:
 
 <DarkBunnyGame>:
@@ -101,17 +102,22 @@ DarkBunnyGame:
 	CreditScreen:
 		id: credits
 	
-<MainScreen@GameScreen>:
+<MainScreen>:
 	name: 'main'
-	FloatLayout:
+	layout: layout
+	FloatLayout:	
+		size: root.size
+		pos: root.pos
 		BoxLayout:
+			id: layout
 			size_hint: (.2, .1)
-			pos_hint: {'x': 0., 'y': 0.}
+			pos: (0., 0.)
 			orientation: 'vertical'
 			DebugPanel:
 			CamouflopButton2:
 				text: 'Pause Game'
 				on_press: app.root.pause_game()
+
 
 <PauseScreen@GameScreen>:
 	name: 'pause'

@@ -8,10 +8,12 @@ import animation
 import environment
 import sound
 from kivy.app import App
-from kivy.properties import StringProperty, NumericProperty, ObjectProperty, ListProperty
+from kivy.properties import (StringProperty, NumericProperty, 
+    ObjectProperty, ListProperty, BooleanProperty)
 from kivy.uix.widget import Widget
+from kivy.uix.label import Label
 import kivent_cython
-from kivent_cython import GameSystem
+from kivent_cython import GameSystem, GameScreen
 from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi, ceil, cos, sin
@@ -20,7 +22,12 @@ class SliderSetting(Widget):
     slider_name = StringProperty('default')
     slider_value = NumericProperty(1.)
 
+
+class MainScreen(GameScreen):
+    pass
+
 class DarkBunnyGame(Widget):
+    
 
     def __init__(self, **kwargs):
         super(DarkBunnyGame, self).__init__(**kwargs)
