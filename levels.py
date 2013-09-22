@@ -109,6 +109,10 @@ class LevelsSystem(GameSystem):
         self.add_environments(self.levels[level_id])
 
     def generate_next_level(self, dt):
+        if self.current_level_id >= len(self.levels):
+            print 'you won!'
+            self.gameworld.state = 'menu'
+            self.current_level_id = 0
         self.clear_level(dt)
         self.add_rabbits(self.levels[self.current_level_id])
         self.add_boundaries()

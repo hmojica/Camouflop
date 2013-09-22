@@ -1,6 +1,6 @@
 class LevelMaps:
     levels = [
-	#level 4
+	#level 0
 	{
 	    'dark_bunny': {'position': (.9, .145)},
             'white_bunnies': [
@@ -104,6 +104,22 @@ class LevelMaps:
                 {'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}
             ],
             'holes': [{'position': (.95, .5)}],
+            'wooden_log': []
+        },
+        #level 4
+        {
+            'dark_bunny': {'position': (.9, .9)},
+            'white_bunnies': [
+                {'position': (.1, .125)},
+                {'position': (.1, .25)}
+            ],
+            'trees': [],
+            'rocks': [],
+            'clouds':[],
+            'holes': [
+                {'position': (.9, .125)},
+                {'position': (.8, .25)}
+            ],
             'wooden_log': []
         }
     ]
