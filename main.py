@@ -109,6 +109,10 @@ class DarkBunnyGame(Widget):
 
     def set_game_over(self):
         self.gameworld.state = 'gameover'
+        systems = self.gameworld.systems
+        levels_system = systems['levels_system']
+        levels_system.current_level_id = 0
+        Clock.schedule_once(levels_system.generate_next_level)
 
     def setup_collision_callbacks(self):
         systems = self.gameworld.systems
