@@ -45,7 +45,9 @@ class LevelMaps:
                 {'position': (.9, .15)},
                 {'position': (.8, .14)}
             ],
-            'clouds': [],
+            'clouds': [
+                {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
+            ],
             'hole': {'position': (.1, .9)}
         },
         #level 3
