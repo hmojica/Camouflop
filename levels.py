@@ -89,6 +89,12 @@ class LevelsSystem(GameSystem):
         boundary_system = self.gameworld.systems['boundary_system']
         boundary_system.add_boundaries()
 
+    def generate_level(self, level_id):
+        self.add_rabbits()
+        self.add_boundaries()
+        self.add_hawk()
+        self.add_environments(self.levels[level_id])
+
     def generate_next_level(self, dt):
         self.add_rabbits()
         self.add_boundaries()
