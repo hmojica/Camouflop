@@ -162,7 +162,7 @@ class RabbitSystem(GameSystem):
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
         rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
-                         'shadow_count': 0, 'acceleration': 1000}
+                         'shadow_count': 0, 'acceleration': 1000, 'touch_effect_radius': 5}
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system,
         'animation_system': animation_system}
@@ -215,27 +215,9 @@ class RabbitSystem(GameSystem):
         YDistance = (white_rabbit_position[1]) - (black_rabbit_position[1])
         self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
-    def calculate_desired_vector(self, target, location, ship_data, ship_ai_data):
-        g_map = self.gameworld.systems['default_map']
-        map_size_x = g_map.map_size[0]/1.9
-        map_size_y = g_map.map_size[1]/1.9
-        dist_x = math.fabs(target[0] - location[0])
-        dist_y = math.fabs(target[1] - location[1])
-        ship_ai_data['distance_to_target'] = Vector(target).distance2(location)
-        max_speed = ship_data['max_speed']
-        v = Vector(target) - Vector(location)
-        v = v.normalize()
-        v *= max_speed
-        if ship_ai_data['ai_state'] == 'flee':
-            v *= -1
-        if dist_x > map_size_x:
-            v[0] *=-1
-        if dist_y > map_size_y:
-            v[1] *=-1
-        return v
-
     def touch_rabbit(self, touch):
-        touch_square = self.query_physics_bb((touch.x,touch.y),5)
+        touch_effect_radius = 5
+        touch_square = self.query_physics_bb((touch.x, touch.y), touch_effect_radius)
         nonplayer_rabbits = self.white_rabbits
         for entity_id in touch_square:
             if entity_id == self.rabbit:
