@@ -113,15 +113,13 @@ class RabbitSystem(GameSystem):
         print 'collide'
         gameworld = self.gameworld
         entities = gameworld.entities
-        # boundary_id = arbiter.shapes[0].body.data
+        boundary_id = arbiter.shapes[1].body.data
         rabbit_id = arbiter.shapes[0].body.data
-        print rabbit_id
         rabbit_entity = entities[rabbit_id]
-        print rabbit_entity
         rabbit_body = rabbit_entity['cymunk-physics']['body']
-        rabbit_body.reset_forces()
-        rabbit_body.velocity = (0, 0)
-        rabbit_body.angular_velocity = (0, 0)
+        #rabbit_body.reset_forces()
+        #rabbit_body.velocity = (0, 0)
+        #rabbit_body.angular_velocity = (0, 0)
         return True
 
     def add_rabbit(self, rabbit_type):
