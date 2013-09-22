@@ -3,7 +3,7 @@ import math
 import hawk
 import boundary
 from kivy.app import App
-from kivy.properties import StringProperty, NumericProperty, ObjectProperty
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty, ListProperty
 from kivy.uix.widget import Widget
 import kivent_cython
 from kivent_cython import GameSystem
@@ -19,8 +19,8 @@ from kivy.graphics import Rectangle
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
-    white_rabbits = []
-    targeted = None
+    white_rabbits = ListProperty([])
+    targeted = NumericProperty(None, allownone=True)
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
@@ -33,7 +33,7 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, -1)
             else:
                 self.change_visibility(entity_id, 2)
-            if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
+            if rabbit_entity['rabbit_system']['visibility'] > 100 and self.targeted is None:
                 self.target(rabbit_entity)
 
     def target(self, rabbit_entity):
@@ -385,9 +385,6 @@ class BackgroundWidget(Widget):
             for y in xrange(y_repeat_num):
                 with self.canvas:
                     Rectangle(pos=(256.*x, 256.*y), size=(256, 256), source='assets/environment/snow_texture.png')
-
-
-
 
 class DarkBunnyGame(Widget):
     bg_texture = ObjectProperty(None)
