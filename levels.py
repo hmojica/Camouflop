@@ -75,11 +75,15 @@ class LevelsSystem(GameSystem):
         self.add_clouds(level_map['clouds'])
         self.add_hole(level_map['hole'])
 
-    def add_rabbits(self):
+    def get_window_position(self, position):
+        return Window.size[0] * position[0], Window.size[1] * position[1]
+
+    def add_rabbits(self, level_map):
         systems = self.gameworld.systems
         rabbit_system = systems['rabbit_system']
-        rabbit_system.add_rabbit('dark_bunny')
-        rabbit_system.add_rabbit('white_rabbit_1')
+        rabbit_system.add_rabbit('dark_bunny', self.get_window_position(level_map['dark_bunny']['position']))
+        for white_bunny in level_map['white_bunnies']:
+            rabbit_system.add_rabbit('white_rabbit', self.get_window_position(white_bunny['position']))
 
     def add_hawk(self):
         hawk_ai_system = self.gameworld.systems['hawk_ai_system']
@@ -90,13 +94,13 @@ class LevelsSystem(GameSystem):
         boundary_system.add_boundaries()
 
     def generate_level(self, level_id):
-        self.add_rabbits()
+        self.add_rabbits(self.levels[level_id])
         self.add_boundaries()
         self.add_hawk()
         self.add_environments(self.levels[level_id])
 
     def generate_next_level(self, dt):
-        self.add_rabbits()
+        self.add_rabbits(self.levels[self.current_level_id])
         self.add_boundaries()
         self.add_hawk()
         self.add_environments(self.levels[self.current_level_id])

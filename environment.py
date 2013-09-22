@@ -115,8 +115,8 @@ class EnvironmentSystem(GameSystem):
                                   'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
                                   'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
         create_component_dict = {'cymunk-physics': physics_component_dict,
-                                 'physics_renderer': renderer,}
-        component_order = ['cymunk-physics', 'physics_renderer']
+                                 'physics_renderer': renderer, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def add_hole(self, position):
