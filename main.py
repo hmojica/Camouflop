@@ -1,10 +1,6 @@
 import kivy
 import math
-import hawk
-import boundary
-import rabbit
-import animation
-import environment
+import levels
 from kivy.app import App
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty, ListProperty
 from kivy.uix.widget import Widget
@@ -13,11 +9,6 @@ from kivent_cython import GameSystem
 from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi, ceil, cos, sin
-from functools import partial
-from random import randint
-from kivy.vector import Vector
-from kivy.core.image import Image as CoreImage
-from kivy.graphics import Rectangle
 
 
 class DarkBunnyGame(Widget):
@@ -103,20 +94,9 @@ class DarkBunnyGame(Widget):
         self.setup_states()
         self.setup_map()
         self.set_state()
-        
 
         Clock.schedule_interval(self.update, 1./60.)
-        Clock.schedule_once(self.setup_boundaries)
-        Clock.schedule_once(self.setup_hawk)
         Clock.schedule_once(self.setup_stuff)
-
-    def setup_hawk(self, dt):
-        hawk_ai_system = self.gameworld.systems['hawk_ai_system']
-        hawk_ai_system.spawn_hawk((500, 500))
-
-    def setup_boundaries(self, dt):
-        boundary_system = self.gameworld.systems['boundary_system']
-        boundary_system.add_boundaries()
 
     def setup_map(self):
         self.gameworld.currentmap = self.gameworld.systems['map']
@@ -138,8 +118,7 @@ class DarkBunnyGame(Widget):
         systems = self.gameworld.systems
         physics = systems['cymunk-physics']
         rabbit_system = systems['rabbit_system']
-        hawk_ai_system = systems['hawk_ai_system']
-        boundary_system = systems['boundary_system']
+
         physics.add_collision_handler(1, 2,
             begin_func=rabbit_system.rabbit_collide_with_hole)
         physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
@@ -169,9 +148,9 @@ class DarkBunnyGame(Widget):
         self.gameworld.state = 'main'
 
     def setup_stuff(self, dt):
-        self.add_rabbit()
-        self.add_hole()
-        self.add_environment()
+        systems = self.gameworld.systems
+        levels_system = systems['levels_system']
+        Clock.schedule_once(levels_system.generate_next_level)
         self.setup_collision_callbacks()
 
 
