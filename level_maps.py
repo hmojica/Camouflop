@@ -2,23 +2,32 @@ class LevelMaps:
     levels = [
 	#level 4
 	{
-	    'dark_bunny': {'position': (.145, .9)},
+	    'dark_bunny': {'position': (.9, .145)},
             'white_bunnies': [
-                {'position': (.95, .9)}
+                {'position': (.95, .9)},
+ 		{'position': (.1, .1)},
+		{'position': (.2, .65)}
             ],
             'trees': [
                 {'position': (.1, .5), 'type': 'small_tree'},
-                {'position': (.8, .3), 'type': 'small_tree'}
+                {'position': (.8, .5), 'type': 'small_tree'},
+		{'position': (.6, .4), 'type': 'large_tree'},
+		{'position': (.2, .8), 'type': 'large_tree'},
+		{'position': (.2, .3), 'type': 'med_tree'},
+		{'position': (.35, .47), 'type': 'med_tree'},
+		{'position': (.55, .1), 'type': 'small_tree'},
+		{'position': (.05, .2), 'type': 'small_tree'}
             ],
             'rocks': [
-                {'position': (.9, .85), 'type': 'large_rock'},
+                {'position': (.9, .78), 'type': 'large_rock'},
                 {'position': (.95, .74), 'type': 'large_rock'},
                 {'position': (.98, .8), 'type': 'med_rock'},
                 {'position': (.85, .8), 'type': 'large_rock'},
+		{'position': (.3, .2), 'type': 'med_rock'},
             ],
             'clouds': [],
             'hole': {'position': (.90, .25)},
-            'wooden_log': [{'position': (.5, .8)}]	
+            'wooden_log': []	
 	},
         #level 1
         {
