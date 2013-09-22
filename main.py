@@ -9,7 +9,7 @@ import kivent_cython
 from kivent_cython import GameSystem
 from kivy.clock import Clock
 from kivy.core.window import Window
-from math import radians, atan2, degrees, pi, ceil
+from math import radians, atan2, degrees, pi, ceil, cos, sin
 from functools import partial
 from random import randint
 from kivy.vector import Vector
@@ -300,6 +300,35 @@ class AnimationSystem(GameSystem):
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
 
+    # def add_hollow_log(self, position, angle):
+    #     x = position[0]
+    #     y = position[1]
+    #     shape_dict = {'width': 69, 'height': 128,
+    #     'mass': 100,}
+    #     col_shape = {'shape_type': 'box', 'elasticity': .5,
+    #     'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
+    #     col_shapes = [col_shape]
+    #     physics_component = {'main_shape': 'circle',
+    #     'velocity': (0, 0),
+    #     'position': (x, y), 'angle': angle,
+    #     'angular_velocity': 0,
+    #     'vel_limit': 0,
+    #     'ang_vel_limit': 0,
+    #     'mass': 0, 'col_shapes': col_shapes}
+    #     create_component_dict = {'cymunk-physics': physics_component,
+    #     'tree_physics_renderer': {'texture':
+    #         'assets/environment/Passable_Log_Closed.png', 'size': (86, 160)},}
+    #     component_order = ['cymunk-physics', 'tree_physics_renderer']
+    #     self.gameworld.init_entity(create_component_dict, component_order)
+    #
+    # def add_passable_log(self, center, angle):
+    #     self.add_hollow_log(center, angle)
+    #     boundary_system = self.gameworld.systems['boundary_system']
+    #     half_width = 36
+    #     boundary_system.add_boundary(1, 128, (center[0] + 36*cos(angle), center[1]-36*sin(angle)), angle)
+    #     boundary_system.add_boundary(1, 128, (center[0] - 36*cos(angle), center[1]+36*sin(angle)), angle)
+
+
     def add_tree_shadow(self, position):
         x = position[0]
         y = position[1]
@@ -320,6 +349,38 @@ class EnvironmentSystem(GameSystem):
             'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)},}
         component_order = ['cymunk-physics', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
+
+    def add_cloud(self, position, img, image_size_w, image_size_h, vel_max ):
+        x = position[0]
+        y = position[1]
+        width = image_size_w
+        height = image_size_h
+        shape_dict = {'width': width*.80, 'height': height*.8, 'mass': 100}
+        col_shape = {'shape_type': 'box', 'elasticity': .5,
+        'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'box',
+        'velocity': (50, 10),
+        'position': (x, y), 'angle': 0,
+        'angular_velocity': 0,
+        'vel_limit': vel_max,
+        'ang_vel_limit': 0,
+        'mass': 100, 'col_shapes': col_shapes}
+        create_component_dict = {'cymunk-physics': physics_component,
+        'hawk_physics_renderer': {'texture':
+            img, 'size': (width, height)},}
+        component_order = ['cymunk-physics', 'hawk_physics_renderer']
+        cloud_id = self.gameworld.init_entity(create_component_dict, component_order)
+        cloud = self.gameworld.entities[cloud_id]
+        physics_data = cloud['cymunk-physics']
+        physics_body = physics_data['body']
+        physics_body.reset_forces()
+        physics_body.velocity = (0, 0)
+        unit_vector = [0, 100]
+        force_offset = unit_vector[0] * -1 * 100, unit_vector[1] * -1 * 100
+        force = 1000 * unit_vector[0], 1000 * unit_vector[1]
+        physics_body.apply_force(force, force_offset)
+
 
     def add_tree(self, position):
         x = position[0]
@@ -433,14 +494,23 @@ class DarkBunnyGame(Widget):
         rock_position2 = (Window.size[0] * .85, Window.size[1] * .50)
         environment_system.add_rock(rock_position2)
 
-        rock_position3 = (Window.size[0] * .50, Window.size[1] * .90)
+        rock_position3 = (Window.size[0] * .55, Window.size[1] * .90)
         environment_system.add_rock(rock_position3)
 
-        rock_position4 = (Window.size[0] * .50, Window.size[1] * .80)
+        rock_position4 = (Window.size[0] * .55, Window.size[1] * .80)
         environment_system.add_rock(rock_position4)
 
-        rock_position5 = (Window.size[0] * .50, Window.size[1] * .70)
+        rock_position5 = (Window.size[0] * .55, Window.size[1] * .70)
         environment_system.add_rock(rock_position5)
+
+        cloud_position1 = (Window.size[0] * .30, Window.size[1] * .20)
+        environment_system.add_cloud(cloud_position1,
+                                     'assets/environment/CloudLGfeather1.png', 389, 171, 50)
+
+        cloud_position2 = (Window.size[0] * .60, Window.size[1] * .80)
+        environment_system.add_cloud(cloud_position2,
+                                     'assets/environment/CloudSMfeather1.png', 196, 87, 30)
+
 
     def init_game(self, dt):
         self.setup_states()
@@ -506,10 +576,13 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(1,4, begin_func=rabbit_system.enter_shadow,
                                       separate_func=rabbit_system.leave_shadow)
         physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 5, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(3, 4, begin_func=self.no_impact_collision)
         physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
         physics.add_collision_handler(10, 11, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(4, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(5, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(11, 4, begin_func=self.no_impact_collision)
 
     def set_state(self):
         self.gameworld.state = 'main'
