@@ -2,15 +2,60 @@ class LevelMaps:
     levels = [
         #level 1
         {
-            'trees': [
-                {'position': (.5, .5), 'type': 'small_tree'}
+            'dark_bunny': {'position': (.145, .4)},
+            'white_bunnies': [
+                {'position': (.15, .8)}
             ],
-            'rocks': [],
+            'trees': [
+                {'position': (.1, .5), 'type': 'small_tree'},
+                {'position': (.8, .3), 'type': 'small_tree'}
+            ],
+            'rocks': [
+                {'position': (.25, .85)},
+                {'position': (.25, .74)},
+                {'position': (.5, .5)},
+                {'position': (.5, .39)},
+                {'position': (.5, .28)},
+                {'position': (.5, .17)},
+                {'position': (.5, .06)},
+                {'position': (.75, .75)},
+                {'position': (.75, .64)},
+                {'position': (.75, .86)}
+            ],
             'clouds': [],
-            'hole': {'position': (.95, .5)}
+            'hole': {'position': (.90, .75)}
         },
         #level 2
         {
+            'dark_bunny': {'position': (.8, .8)},
+            'white_bunnies': [
+                {'position': (.1, .6)}
+                # {'position': (.8, .5)}
+            ],
+            'trees': [
+                {'position': (.5, .7), 'type': 'small_tree'},
+                {'position': (.2, .4), 'type': 'small_tree'},
+                {'position': (.5, .22), 'type': 'small_tree'}
+            ],
+            'rocks': [
+                {'position': (.65, .85)},
+                {'position': (.7, .74)},
+                {'position': (.1, .15)},
+                {'position': (.18, .14)},
+                {'position': (.9, .15)},
+                {'position': (.8, .14)}
+            ],
+            'clouds': [
+                {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
+            ],
+            'hole': {'position': (.1, .9)}
+        },
+        #level 3
+        {
+            'dark_bunny': {'position': (.125, .167)},
+            'white_bunnies': [
+                {'position': (.125, .67)}
+            ],
             'trees': [
                 {'position': (.5, .25), 'type': 'small_tree'},
                 {'position': (.25, .75), 'type': 'small_tree'},

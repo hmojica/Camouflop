@@ -67,10 +67,10 @@ class RabbitSystem(GameSystem):
         '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
         'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
         'current_frame_time': 0., 'number_of_frames': 6}
-        rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50, 'x': 100, 'y': 100,
+        rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50,
                                       'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
                                       'anim_state': black_rabbit_anim_dict}
-        rabbit_dicts['white_rabbit_1'] = {'outer_radius': 16, 'mass': 35, 'x': 100, 'y': 400,
+        rabbit_dicts['white_rabbit'] = {'outer_radius': 16, 'mass': 35,
                                         'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
                                         'anim_state': white_rabbit_anim_dict}
 
@@ -146,10 +146,10 @@ class RabbitSystem(GameSystem):
         #rabbit_body.angular_velocity = (0, 0)
         return True
 
-    def add_rabbit(self, rabbit_type):
+    def add_rabbit(self, rabbit_type, position):
         rabbit_info = self.rabbit_dicts[rabbit_type]
-        x = rabbit_info['x']
-        y = rabbit_info['y']
+        x = position[0]
+        y = position[1]
         shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'],
             'mass': rabbit_info['mass'], 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,

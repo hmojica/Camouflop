@@ -91,6 +91,7 @@ class DarkBunnyGame(Widget):
     def setup_stuff(self, dt):
         systems = self.gameworld.systems
         levels_system = systems['levels_system']
+        # levels_system.current_level_id = 1
         Clock.schedule_once(levels_system.generate_next_level)
         self.setup_collision_callbacks()
         self.gameworld.music_controller.play_new_song(30)
