@@ -34,8 +34,7 @@ class DarkBunnyGame(Widget):
             Clock.schedule_once(self._init_game)
 
     def add_hole(self):
-        x = 500
-        y = 100
+        position = [Window.size[0]*.95, Window.size[1]/2]
         shape_dict = {'inner_radius': 0, 'outer_radius': 10,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
@@ -43,7 +42,7 @@ class DarkBunnyGame(Widget):
         col_shapes = [col_shape]
         physics_component = {'main_shape': 'circle',
         'velocity': (0, 0),
-        'position': (x, y), 'angle': 0,
+        'position': position, 'angle': 0,
         'angular_velocity': 0,
         'vel_limit': 250,
         'ang_vel_limit': radians(200),
@@ -63,10 +62,42 @@ class DarkBunnyGame(Widget):
     def add_environment(self):
         systems = self.gameworld.systems
         environment_system = systems['environment_system']
-        tree_position = (300, 150)
-        tree_shadow_position = (325, 125)
-        environment_system.add_tree(tree_position)
-        environment_system.add_tree_shadow(tree_shadow_position)
+        tree_position1 = (Window.size[0] * .5, Window.size[1] * .25)
+        environment_system.add_tree(tree_position1)
+        environment_system.add_tree_shadow(tree_position1)
+
+        tree_position2 = (Window.size[0] * .25, Window.size[1] * .75)
+        environment_system.add_tree(tree_position2)
+        environment_system.add_tree_shadow(tree_position2)
+
+        tree_position3 = (Window.size[0] * .75, Window.size[1] * .75)
+        environment_system.add_tree(tree_position3)
+        environment_system.add_tree_shadow(tree_position3)
+
+        rock_position1 = (Window.size[0] * .90, Window.size[1] * .40)
+        environment_system.add_rock(rock_position1)
+
+        rock_position2 = (Window.size[0] * .85, Window.size[1] * .50)
+        environment_system.add_rock(rock_position2)
+
+        rock_position3 = (Window.size[0] * .55, Window.size[1] * .90)
+        environment_system.add_rock(rock_position3)
+
+        rock_position4 = (Window.size[0] * .55, Window.size[1] * .80)
+        environment_system.add_rock(rock_position4)
+
+        rock_position5 = (Window.size[0] * .55, Window.size[1] * .70)
+        environment_system.add_rock(rock_position5)
+
+        cloud_position1 = (Window.size[0] * .30, Window.size[1] * .20)
+        environment_system.add_cloud(cloud_position1,
+                                     'assets/environment/CloudLGfeather1.png', 389, 171, 50)
+
+        cloud_position2 = (Window.size[0] * .60, Window.size[1] * .80)
+        environment_system.add_cloud(cloud_position2,
+                                     'assets/environment/CloudSMfeather1.png', 196, 87, 30)
+
+
 
     def init_game(self, dt):
         self.setup_states()
@@ -129,6 +160,10 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(10, 11, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1, 3, begin_func=self.no_impact_collision,
                                       separate_func=rabbit_system.collide_rabbit_with_hawk)
+        physics.add_collision_handler(4, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(5, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(11, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(2, 4, begin_func=self.no_impact_collision)
 
     def set_state(self):
         self.gameworld.state = 'main'
