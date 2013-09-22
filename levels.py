@@ -64,10 +64,11 @@ class LevelsSystem(GameSystem):
             cloud_type = cloud['type']
             environment_system.add_cloud(cloud_position, cloud_type, vel_max=50)
 
-    def add_hole(self, hole):
+    def add_holes(self, holes):
         environment_system = self.gameworld.systems['environment_system']
-        hole_position = (Window.size[0] * hole['position'][0], Window.size[1] * hole['position'][1])
-        environment_system.add_hole(hole_position)
+        for hole in holes:
+            hole_position = (Window.size[0] * hole['position'][0], Window.size[1] * hole['position'][1])
+            environment_system.add_hole(hole_position)
 
     def add_wooden_logs(self, wooden_logs):
         environment_system = self.gameworld.systems['environment_system']
@@ -80,7 +81,7 @@ class LevelsSystem(GameSystem):
         self.add_trees(level_map['trees'])
         self.add_rocks(level_map['rocks'])
         self.add_clouds(level_map['clouds'])
-        self.add_hole(level_map['hole'])
+        self.add_holes(level_map['holes'])
         self.add_wooden_logs(level_map['wooden_log'])
 
     def get_window_position(self, position):
@@ -108,6 +109,10 @@ class LevelsSystem(GameSystem):
         self.add_environments(self.levels[level_id])
 
     def generate_next_level(self, dt):
+        if self.current_level_id >= len(self.levels):
+            print 'you won!'
+            self.gameworld.state = 'menu'
+            self.current_level_id = 0
         self.clear_level(dt)
         self.add_rabbits(self.levels[self.current_level_id])
         self.add_boundaries()
