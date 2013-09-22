@@ -108,6 +108,34 @@ class LevelMaps:
         },
         #level 4
         {
+            'dark_bunny': {'position': (.5, .5)},
+                'white_bunnies': [
+                    {'position': (.1, .7)},
+            {'position': (.3, .3)},
+            {'position': (.7, .7)}
+                ],
+                'trees': [
+                    {'position': (.4, .2), 'type': 'small_tree'},
+                    {'position': (.6, .4), 'type': 'small_tree'},
+            {'position': (.4, .4), 'type': 'small_tree'}
+
+                ],
+                'rocks': [
+                    {'position': (.1, .6), 'type': 'large_rock'},
+                    {'position': (.2, .6), 'type': 'large_rock'},
+                    {'position': (.3, .6), 'type': 'med_rock'},
+                    {'position': (.4, .5), 'type': 'large_rock'},
+            {'position': (.4, .4), 'type': 'med_rock'},
+            {'position': (.5, .3), 'type': 'med_rock'},
+            {'position': (.6, .6), 'type': 'med_rock'},
+            {'position': (.6, .5), 'type': 'med_rock'}
+                ],
+                'clouds': [],
+                'holes': [{'position': (.9, .1)}],
+                'wooden_log': []
+        },
+        #level 5
+        {
             'dark_bunny': {'position': (.9, .9)},
             'white_bunnies': [
                 {'position': (.1, .125)},
