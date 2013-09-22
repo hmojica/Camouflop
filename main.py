@@ -3,22 +3,24 @@ import math
 import hawk
 import boundary
 from kivy.app import App
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.uix.widget import Widget
 import kivent_cython
 from kivent_cython import GameSystem
 from kivy.clock import Clock
 from kivy.core.window import Window
-from math import radians, atan2, degrees, pi
+from math import radians, atan2, degrees, pi, ceil
 from functools import partial
 from random import randint
 from kivy.vector import Vector
 from kivy.core.image import Image as CoreImage
+from kivy.graphics import Rectangle
 
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
     white_rabbits = []
+    targeted = None
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
@@ -31,6 +33,22 @@ class RabbitSystem(GameSystem):
                 self.change_visibility(entity_id, -1)
             else:
                 self.change_visibility(entity_id, 2)
+            if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
+                self.target(rabbit_entity)
+
+    def target(self, rabbit_entity):
+        self.targeted = rabbit_entity['id']
+        Clock.schedule_once(self.attack, 15.)
+
+    def attack(self, dt):
+        if self.targeted is None:
+            return
+        Clock.schedule_once(partial(self.gameworld.timed_remove_entity, self.targeted))
+        if self.rabbit == self.targeted:
+            self.rabbit = None
+        elif self.targeted in self.white_rabbits:
+            self.white_rabbits.remove(self.targeted)
+        self.targeted = None
 
 
     def change_visibility(self, rabbit_id, amount):
@@ -77,11 +95,13 @@ class RabbitSystem(GameSystem):
         return False
 
     def enter_shadow(self, space, arbiter):
+        print 'start of begin'
         rabbit_id = arbiter.shapes[0].body.data
         rabbit_entity = self.gameworld.entities[rabbit_id]
         rabbit_entity['rabbit_system']['shadow_count'] += 1
         is_black = rabbit_id == self.rabbit
         self.update_is_safe(rabbit_entity, is_black)
+        print 'calling begin'
         return False
 
     def update_is_safe(self, rabbit_entity, is_black):
@@ -90,8 +110,11 @@ class RabbitSystem(GameSystem):
             or (rabbit_system['shadow_count'] == 0 and not is_black)
         if has_camouflage:
             rabbit_system['is_safe'] = True
+            print [rabbit_entity, ' is safe', rabbit_system['visibility']]
         elif not rabbit_system['in_log']:
             rabbit_system['is_safe'] = False
+            print [rabbit_entity, ' is in danger', rabbit_system['visibility']]
+
 
 
     def leave_shadow(self, space, arbiter):
@@ -116,9 +139,9 @@ class RabbitSystem(GameSystem):
         rabbit_id = arbiter.shapes[0].body.data
         rabbit_entity = entities[rabbit_id]
         rabbit_body = rabbit_entity['cymunk-physics']['body']
-        rabbit_body.reset_forces()
-        rabbit_body.velocity = (0, 0)
-        rabbit_body.angular_velocity = (0, 0)
+        #rabbit_body.reset_forces()
+        #rabbit_body.velocity = (0, 0)
+        #rabbit_body.angular_velocity = (0, 0)
         return True
 
     def add_rabbit(self, rabbit_type):
@@ -145,7 +168,8 @@ class RabbitSystem(GameSystem):
         'mass': 50, 'col_shapes': col_shapes}
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
-        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': False, 'in_log': False,
+        is_safe = not rabbit_type == 'dark_bunny'
+        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
                          'shadow_count': 0}
         create_component_dict = {'cymunk-physics': physics_component, 
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system, 
@@ -161,7 +185,7 @@ class RabbitSystem(GameSystem):
         if not called_rabbit is None:
             if called_rabbit == self.rabbit:
                 self.stop_rabbit(self.gameworld.entities[called_rabbit])
-            else:
+            elif self.rabbit is not None:
                 self.call_rabbit(called_rabbit)
         elif self.rabbit is not None:
             rabbit = self.gameworld.entities[self.rabbit]
@@ -279,7 +303,7 @@ class EnvironmentSystem(GameSystem):
     def add_tree_shadow(self, position):
         x = position[0]
         y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        shape_dict = {'inner_radius': 0, 'outer_radius': 100,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 4, 'shape_info': shape_dict, 'friction': 1.0}
@@ -293,7 +317,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'shadow_renderer': {'texture':
-            'treeshadow.png', 'size': (200, 200)},}
+            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)},}
         component_order = ['cymunk-physics', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
@@ -314,12 +338,42 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'tree_physics_renderer': {'texture':
-            'green_snow_tree.png', 'size': (80, 80)},}
+            'assets/environment/green_snow_tree.png', 'size': (80, 80)},}
         component_order = ['cymunk-physics', 'tree_physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
+    def add_rock(self, position):
+        x = position[0]
+        y = position[1]
+        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        'mass': 100, 'offset': (0, 0)}
+        col_shape_dict = {'shape_type': 'circle', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict, 'friction': 1.0}
+        physics_component_dict = {'main_shape': 'circle', 'velocity': (0, 0), 'position': (x, y),
+                                  'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
+                                  'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
+        create_component_dict = {'cymunk-physics': physics_component_dict,
+                                 'physics_renderer': {'texture': 'assets/environment/rock.png', 'size': (50, 50)},}
+        component_order = ['cymunk-physics', 'physics_renderer']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+class BackgroundWidget(Widget):
+    def __init__(self, **kwargs):
+        super(BackgroundWidget, self).__init__(**kwargs)
+        Clock.schedule_once(self.setup_background)
+
+    def setup_background(self, dt):
+        size = Window.size
+        x_repeat_num = int(ceil(size[0]/256.))
+        y_repeat_num = int(ceil(size[1]/256.))
+        for x in xrange(x_repeat_num):
+            for y in xrange(y_repeat_num):
+                with self.canvas:
+                    Rectangle(pos=(256.*x, 256.*y), size=(256, 256), source='assets/environment/snow_texture.png')
+
+
 
 class DarkBunnyGame(Widget):
+    bg_texture = ObjectProperty(None)
     
     def __init__(self, **kwargs):
         super(DarkBunnyGame, self).__init__(**kwargs)
@@ -361,13 +415,32 @@ class DarkBunnyGame(Widget):
     def add_environment(self):
         systems = self.gameworld.systems
         environment_system = systems['environment_system']
-        tree_position1 = (Window.size[0] * .5, Window.size[1] * 1/4)
+        tree_position1 = (Window.size[0] * .5, Window.size[1] * .25)
         environment_system.add_tree(tree_position1)
         environment_system.add_tree_shadow(tree_position1)
 
         tree_position2 = (Window.size[0] * .25, Window.size[1] * .75)
         environment_system.add_tree(tree_position2)
         environment_system.add_tree_shadow(tree_position2)
+
+        tree_position3 = (Window.size[0] * .75, Window.size[1] * .75)
+        environment_system.add_tree(tree_position3)
+        environment_system.add_tree_shadow(tree_position3)
+
+        rock_position1 = (Window.size[0] * .90, Window.size[1] * .40)
+        environment_system.add_rock(rock_position1)
+
+        rock_position2 = (Window.size[0] * .85, Window.size[1] * .50)
+        environment_system.add_rock(rock_position2)
+
+        rock_position3 = (Window.size[0] * .50, Window.size[1] * .90)
+        environment_system.add_rock(rock_position3)
+
+        rock_position4 = (Window.size[0] * .50, Window.size[1] * .80)
+        environment_system.add_rock(rock_position4)
+
+        rock_position5 = (Window.size[0] * .50, Window.size[1] * .70)
+        environment_system.add_rock(rock_position5)
 
     def init_game(self, dt):
         self.setup_states()
@@ -429,6 +502,7 @@ class DarkBunnyGame(Widget):
         physics.add_collision_handler(1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
         physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
         physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(10,4,begin_func=self.no_impact_collision)
         physics.add_collision_handler(1,4, begin_func=rabbit_system.enter_shadow,
                                       separate_func=rabbit_system.leave_shadow)
         physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)

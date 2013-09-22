@@ -22,10 +22,10 @@ class BoundarySystem(GameSystem):
         gamescreen_width = self.size[0]
         gamescreen_height = self.size[1]
         ##left bounding box
-        self.add_boundary(gamescreen_height, 1, (0, gamescreen_height/2))
+        self.add_boundary(gamescreen_height, 5, (0, gamescreen_height/2))
         #bottom bounding box
-        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, 0))
+        self.add_boundary(5, gamescreen_width, (gamescreen_width/2, 0))
         #right bounding box
-        self.add_boundary(gamescreen_height, 1, (gamescreen_width, gamescreen_height/2))
+        self.add_boundary(gamescreen_height, 5, (gamescreen_width, gamescreen_height/2))
         #top bounding box
-        self.add_boundary(1, gamescreen_width, (gamescreen_width/2, gamescreen_height))
+        self.add_boundary(5, gamescreen_width, (gamescreen_width/2, gamescreen_height))
