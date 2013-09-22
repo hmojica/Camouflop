@@ -16,6 +16,10 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi, ceil, cos, sin
 
+class SliderSetting(Widget):
+    slider_name = StringProperty('default')
+    slider_value = NumericProperty(1.)
+
 
 class DarkBunnyGame(Widget):
 
@@ -51,15 +55,41 @@ class DarkBunnyGame(Widget):
             systems_removed=[],
             systems_paused=[], systems_unpaused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer',
-            'animation_system', 'shadow_renderer'],
+            'animation_system', 'shadow_renderer', 'hawk_ai_system', 
+            'rabbit_system'],
             screenmanager_screen='main')
         self.gameworld.add_state(state_name='menu', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
             'hawk_physics_renderer', 'shadow_renderer',],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
-            'shadow_renderer', 'animation_system'], systems_unpaused=[],
+            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='menu')
+        self.gameworld.add_state(state_name='settings', systems_added=[],
+            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer',],
+            systems_paused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=[],
+            screenmanager_screen='settings')
+        self.gameworld.add_state(state_name='gameover', systems_added=[],
+            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer',],
+            systems_paused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=[],
+            screenmanager_screen='gameover')
+        self.gameworld.add_state(state_name='pause', systems_added=[],
+            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer',],
+            systems_paused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=[],
+            screenmanager_screen='pause')
 
     def no_impact_collision(self, space, arbiter):
         return False
@@ -67,11 +97,13 @@ class DarkBunnyGame(Widget):
     def start_game(self):
         self.gameworld.state = 'main'
 
+    def set_game_over(self):
+        self.gameworld.state = 'gameover'
+
     def setup_collision_callbacks(self):
         systems = self.gameworld.systems
         physics = systems['cymunk-physics']
         rabbit_system = systems['rabbit_system']
-
         physics.add_collision_handler(1, 2,
             begin_func=rabbit_system.rabbit_collide_with_hole)
         physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
@@ -100,6 +132,9 @@ class DarkBunnyGame(Widget):
 
     def set_state(self):
         self.gameworld.state = 'menu'
+
+    def open_settings(self):
+        self.gameworld.state = 'settings'
 
     def setup_stuff(self, dt):
         systems = self.gameworld.systems
