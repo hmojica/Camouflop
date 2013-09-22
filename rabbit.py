@@ -15,7 +15,7 @@ class RabbitSystem(GameSystem):
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
-        self.setup_rabbit_dicts()
+        # self.setup_rabbit_dicts()
 
     def update(self, dt):
         for entity_id in self.entity_ids:
@@ -29,7 +29,7 @@ class RabbitSystem(GameSystem):
                 self.targeted = rabbit_entity['id']
                 sound_system = self.gameworld.systems['sound_system']
                 Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_diving'))
-            if  self.targeted is not None:
+            if self.targeted is not None:
                 if 'rabbit_system' in entities[self.targeted]:
                     if entities[self.targeted]['rabbit_system']['visibility'] < 800:
                         self.targeted = None
@@ -55,24 +55,24 @@ class RabbitSystem(GameSystem):
         rabbit_visibility = rabbit_visibility + amount
         rabbit_entity['rabbit_system']['visibility'] = rabbit_visibility
 
-    def setup_rabbit_dicts(self):
-        self.rabbit_dicts = rabbit_dicts = {}
-        dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-        white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-        white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
-        '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
-        'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
-        'current_frame_time': 0., 'number_of_frames': 6}
-        black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
-        '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
-        'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
-        'current_frame_time': 0., 'number_of_frames': 6}
-        rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50,
-                                      'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
-                                      'anim_state': black_rabbit_anim_dict}
-        rabbit_dicts['white_rabbit'] = {'outer_radius': 16, 'mass': 35,
-                                        'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
-                                        'anim_state': white_rabbit_anim_dict}
+    # def setup_rabbit_dicts(self):
+    #     self.rabbit_dicts = rabbit_dicts = {}
+    #     dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+    #     white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+    #     white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
+    #     '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
+    #     'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+    #     'current_frame_time': 0., 'number_of_frames': 6}
+    #     black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
+    #     '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
+    #     'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
+    #     'current_frame_time': 0., 'number_of_frames': 6}
+    #     rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50,
+    #                                   'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
+    #                                   'anim_state': black_rabbit_anim_dict}
+        # rabbit_dicts['white_rabbit'] = {'outer_radius': 16, 'mass': 35,
+        #                                 'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
+        #                                 'anim_state': white_rabbit_anim_dict}
 
     def rabbit_collide_with_hole(self, space, arbiter):
         gameworld = self.gameworld
@@ -146,8 +146,42 @@ class RabbitSystem(GameSystem):
         #rabbit_body.angular_velocity = (0, 0)
         return True
 
+    def get_rabbit_dict(self, rabbit_type):
+        if rabbit_type == 'white_rabbit':
+            white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
+            '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
+            'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+            'current_frame_time': 0., 'number_of_frames': 6}
+            return {'outer_radius': 16, 'mass': 35,
+                    'angle': 0, 'vel_limit': 250,
+                    'physics_renderer': white_rabbit_physics_renderer,
+                    'anim_state': white_rabbit_anim_dict}
+        else:
+            dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+            black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
+                '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
+                'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
+                'current_frame_time': 0., 'number_of_frames': 6}
+            return {'outer_radius': 18, 'mass': 50,
+                    'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
+                    'anim_state': black_rabbit_anim_dict}
+
+
     def add_rabbit(self, rabbit_type, position):
-        rabbit_info = self.rabbit_dicts[rabbit_type]
+        rabbit_info = self.get_rabbit_dict(rabbit_type)
+        # if rabbit_type == 'white_rabbit':
+        #     white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
+        #     white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
+        #     '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
+        #     'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+        #     'current_frame_time': 0., 'number_of_frames': 6}
+        #     rabbit_info = {'outer_radius': 16, 'mass': 35,
+        #                                 'angle': 0, 'vel_limit': 250,
+        #                                 'physics_renderer': white_rabbit_physics_renderer,
+        #                                 'anim_state': white_rabbit_anim_dict}
+        # else:
+        #     rabbit_info = self.rabbit_dicts[rabbit_type]
         x = position[0]
         y = position[1]
         shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'],
@@ -206,7 +240,7 @@ class RabbitSystem(GameSystem):
         body.angular_velocity = 0
         unit_vector = body.rotation_vector
         rabbit_type = rabbit['rabbit_system']['rabbit_type']
-        rabbit_info = self.rabbit_dicts[rabbit_type]
+        rabbit_info = self.get_rabbit_dict(rabbit_type)
         outer_radius = rabbit_info['outer_radius']
         force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
         acceleration = rabbit['rabbit_system']['acceleration']

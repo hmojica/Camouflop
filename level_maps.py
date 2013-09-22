@@ -4,7 +4,7 @@ class LevelMaps:
         {
             'dark_bunny': {'position': (.145, .4)},
             'white_bunnies': [
-                {'position': (.15, .8)}
+                {'position': (.15, .8)},
             ],
             'trees': [
                 {'position': (.1, .5), 'type': 'small_tree'},
@@ -30,8 +30,9 @@ class LevelMaps:
         {
             'dark_bunny': {'position': (.8, .8)},
             'white_bunnies': [
-                {'position': (.1, .6)}
-                # {'position': (.8, .5)}
+                {'position': (.1, .6)},
+                {'position': (.1, .05)},
+                {'position': (.9, .05)}
             ],
             'trees': [
                 {'position': (.5, .7), 'type': 'small_tree'},
@@ -49,7 +50,8 @@ class LevelMaps:
             'clouds': [
                 {'position': (.5, .5), 'type': 'large_feather', 'vel_max': 0, 'ang_vel': 0}
             ],
-            'hole': {'position': (.1, .9)}
+            'hole': {'position': (.1, .9)},
+            'wooden_log': []
         },
         #level 3
         {
@@ -73,6 +75,7 @@ class LevelMaps:
                 {'position': (.3, .2), 'type': 'large_feather', 'vel_max': 50, 'ang_vel': -.15},
                 {'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}
             ],
-            'hole': {'position': (.95, .5)}
+            'hole': {'position': (.95, .5)},
+            'wooden_log': []
         }
     ]
