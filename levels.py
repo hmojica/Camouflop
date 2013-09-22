@@ -54,7 +54,7 @@ class LevelsSystem(GameSystem):
         environment_system = self.gameworld.systems['environment_system']
         for rock in rocks:
             rock_position = (Window.size[0] * rock['position'][0], Window.size[1] * rock['position'][1])
-            environment_system.add_rock(rock_position)
+            environment_system.add_rock(rock_position, type=rock['type'])
 
     def add_clouds(self, clouds):
         environment_system = self.gameworld.systems['environment_system']
