@@ -6,17 +6,34 @@ from kivent_cython import GameSystem, Clock, partial
 
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
+    images = {
+        'small_tree': ('assets/environment/GrnSnwTreSM.png',128,128),
+        'med_tree': ('assets/environment/GrnSnwTreMD.png',176,176),
+        'large_tree': ('assets/environment/GrnSnwTreLG.png',224,224),
+        'small_tree_shadow': ('assets/environment/GrnTreShadowSM2.png',128,122),
+        'med_tree_shadow': ('assets/environment/GrnTreShadowMD2.png',156,150),
+        'large_tree_shadow': ('assets/environment/GrnTreShadowLG2.png',198,198),
+        'small_rock': ('assets/environment/rockSM.png',34,33),
+        'med_rock': ('assets/environment/rockMD.png',58,56),
+        'large_rock': ('assets/environment/rockLG.png',70,70),
+        'snow_bank_a': ('assets/environment/SnowBankA.png',160,200),
+        'snow_bank_b': ('assets/environment/SnowBankB.png',160,100),
+        'snow_crack_a': ('assets/environment/SnowCrackA.png',160,100),
+        'snow_crack_b': ('assets/environment/SnowCrackB.png',126,76),
+        'snow_drift_a': ('assets/environment/SnowDriftA.png',184,112),
+        'snow_drift_b': ('assets/environment/SnowDriftB.png',160,100),
+        'snow_hill_a': ('assets/environment/SnowHillA.png',160,100),
+        'snow_hill_b': ('assets/environment/SnowHillB.png',160,100)
+    }
 
-    def get_tree_shadow_renderer(self, type):
-        if type == 'small':
-            return {'texture':
-            'assets/environment/GrnTreShadowSM.png', 'size': (146, 144)}
-
+    def get_renderer(self, type):
+        image = self.images[type]
+        return {'texture': image[0], 'size': (image[1], image[2])}
 
     def add_tree_shadow(self, position, type):
         x = position[0] + 50
         y = position[1] - 50
-        shadow_renderer = self.get_tree_shadow_renderer(type)
+        shadow_renderer = self.get_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': shadow_renderer['size'][0]/2,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
@@ -73,14 +90,10 @@ class EnvironmentSystem(GameSystem):
         force = 1000 * unit_vector[0], 1000 * unit_vector[1]
         physics_body.apply_force(force, force_offset)
 
-    def get_tree_renderer(self, type):
-        if type == 'small':
-            return {'texture': 'assets/environment/green_snow_tree.png', 'size': (80, 80)}
-
     def add_tree(self, position, type):
         x = position[0]
         y = position[1]
-        physics_renderer = self.get_tree_renderer(type)
+        physics_renderer = self.get_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': physics_renderer['size'][0]/8,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
@@ -97,16 +110,13 @@ class EnvironmentSystem(GameSystem):
         'tree_physics_renderer': physics_renderer, 'environment_system': {}}
         component_order = ['cymunk-physics', 'tree_physics_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
+        type = type + '_shadow'
         self.add_tree_shadow(position, type)
 
-    def get_rock_renderer(self, type):
-        if type == 'rock':
-            return {'texture': 'assets/environment/rock.png', 'size': (70, 70)}
-
-    def add_rock(self, position, type='rock'):
+    def add_rock(self, position, type='large_rock'):
         x = position[0]
         y = position[1]
-        renderer = self.get_rock_renderer(type)
+        renderer = self.get_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': renderer['size'][0]/2.,
         'mass': 100, 'offset': (0, 0)}
         col_shape_dict = {'shape_type': 'circle', 'elasticity': .5, 'collision_type': 5, 'shape_info': shape_dict,
@@ -117,6 +127,12 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer, 'environment_system': {}}
         component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
+        self.gameworld.init_entity(create_component_dict, component_order)
+
+    def load_snowtexture(self, type, position):
+        create_component_dict = {'position': {'position': position},
+        'quadtree_renderer': self.get_renderer(type)}
+        component_order = ['position', 'quadtree_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def add_hole(self, position):

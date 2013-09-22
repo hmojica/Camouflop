@@ -86,7 +86,10 @@ class RabbitSystem(GameSystem):
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
         if self.rabbit == rabbit_id:
             self.rabbit = None
-            Clock.schedule_once(gameworld.systems['levels_system'].clear_level)
+            if self.white_rabbits == []:
+                time_offset = 0
+            else:
+                time_offset = 10
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
         if self.rabbit == None and self.white_rabbits == []:
@@ -112,8 +115,6 @@ class RabbitSystem(GameSystem):
         elif not rabbit_system['in_log']:
             rabbit_system['is_safe'] = False
             print [rabbit_entity, ' is in danger', rabbit_system['visibility']]
-
-
 
     def leave_shadow(self, space, arbiter):
         rabbit_id = arbiter.shapes[0].body.data

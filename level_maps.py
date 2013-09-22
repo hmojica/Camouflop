@@ -7,8 +7,8 @@ class LevelMaps:
                 {'position': (.15, .8)}
             ],
             'trees': [
-                {'position': (.1, .5), 'type': 'small'},
-                {'position': (.8, .3), 'type': 'small'}
+                {'position': (.1, .5), 'type': 'small_tree'},
+                {'position': (.8, .3), 'type': 'small_tree'}
             ],
             'rocks': [
                 {'position': (.25, .85)},
@@ -33,9 +33,9 @@ class LevelMaps:
                 # {'position': (.8, .5)}
             ],
             'trees': [
-                {'position': (.5, .7), 'type': 'small'},
-                {'position': (.2, .4), 'type': 'small'},
-                {'position': (.5, .22), 'type': 'small'}
+                {'position': (.5, .7), 'type': 'small_tree'},
+                {'position': (.2, .4), 'type': 'small_tree'},
+                {'position': (.5, .22), 'type': 'small_tree'}
             ],
             'rocks': [
                 {'position': (.65, .85)},
@@ -57,9 +57,9 @@ class LevelMaps:
                 {'position': (.125, .67)}
             ],
             'trees': [
-                {'position': (.5, .25), 'type': 'small'},
-                {'position': (.25, .75), 'type': 'small'},
-                {'position': (.75, .75), 'type': 'small'}
+                {'position': (.5, .25), 'type': 'small_tree'},
+                {'position': (.25, .75), 'type': 'small_tree'},
+                {'position': (.75, .75), 'type': 'small_tree'}
             ],
             'rocks': [
                 {'position': (.9, .4)},
