@@ -15,7 +15,7 @@ class HawkAISystem(GameSystem):
         super(HawkAISystem, self).remove_entity(entity_id)
 
     def calculate_desired_angle_delta(self, target_vector, unit_vector):
-        desired_angle_delta = Vector(unit_vector).angle((target_vector[0], 
+        desired_angle_delta = Vector(unit_vector).angle((target_vector[0],
             target_vector[1]))
         return desired_angle_delta
 
@@ -68,9 +68,9 @@ class HawkAISystem(GameSystem):
         if system_data['ai_state'] == 'flee':
             v *= -1
         #if dist_x > map_size_x:
-        #    v[0] *=-1
+        # v[0] *=-1
         #if dist_y > map_size_y:
-        #    v[1] *=-1
+        # v[1] *=-1
         return v
 
     def update_steering(self, dt):
@@ -90,11 +90,11 @@ class HawkAISystem(GameSystem):
                 size = Window.size
                 target_position = (random()*size[0], random()*size[1])
             dist = Vector(target_position).distance(position)
-            if dist > follow_distance and system_data['ai_state'] == 'flee': 
+            if dist > follow_distance and system_data['ai_state'] == 'flee':
                 system_data['ai_state'] = 'follow'
             if dist < 5 and system_data['ai_state'] == 'follow':
                 system_data['ai_state'] = 'flee'
-            desired_vector = self.calculate_desired_vector(target_position, 
+            desired_vector = self.calculate_desired_vector(target_position,
                 position, system_data)
             desired_vector *= 1.5
             #avoidance_vector = self.avoid_obstacles_vector(entity_id, position)
@@ -107,7 +107,7 @@ class HawkAISystem(GameSystem):
         physics_data = entity['cymunk-physics']
         system_data = entity[self.system_id]
         unit_vector = physics_data['unit_vector']
-        desired_angle = self.do_turning(target_vector, unit_vector, 
+        desired_angle = self.do_turning(target_vector, unit_vector,
             system_data, physics_data['body'])
         self.do_thrusting(system_data, desired_angle)
 
@@ -124,9 +124,9 @@ class HawkAISystem(GameSystem):
         if distance_to_target > follow_distance or system_data['ai_state'] == 'flee':
             if -45 <= desired_angle <= 45 and not None:
                 system_data['fire_engines'] = True
-            else: 
+            else:
                 system_data['fire_engines'] = False
-        else: 
+        else:
             system_data['fire_engines'] = False
 
     def do_turning(self, target_vector, unit_vector, system_data, physics_body):
@@ -175,11 +175,11 @@ class HawkAISystem(GameSystem):
             physics_data = character['cymunk-physics']
             physics_body = physics_data['body']
             system_data = character[self.system_id]
-            if system_data['fire_engines'] and 'unit_vector' in physics_data:   
+            if system_data['fire_engines'] and 'unit_vector' in physics_data:
                 unit_vector = physics_data['unit_vector']
-                offset = (system_data['offset_distance'] * -unit_vector[0], 
+                offset = (system_data['offset_distance'] * -unit_vector[0],
                 system_data['offset_distance'] * -unit_vector[1])
-                force = (system_data['engine_speed_multiplier'] * system_data['accel']*dt * unit_vector[0], 
+                force = (system_data['engine_speed_multiplier'] * system_data['accel']*dt * unit_vector[0],
                 system_data['engine_speed_multiplier'] * system_data['accel']*dt * unit_vector[1])
                 physics_body.apply_impulse(force, offset)
             if physics_body.is_sleeping:
@@ -217,3 +217,6 @@ class HawkAISystem(GameSystem):
         component_order = ['cymunk-physics', 'hawk_physics_renderer', 'hawk_ai_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
+    def clear_hawk(self):
+        for entity_id in self.entity_ids:
+            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))

@@ -86,6 +86,11 @@ class RabbitSystem(GameSystem):
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
         if self.rabbit == rabbit_id:
             self.rabbit = None
+            if self.white_rabbits == []:
+                time_offset = 0
+            else:
+                time_offset = 10
+            Clock.schedule_once(gameworld.systems['levels_system'].clear_level, time_offset)
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
         if self.rabbit == None and self.white_rabbits == []:
@@ -242,3 +247,7 @@ class RabbitSystem(GameSystem):
         bb_list = [position[0] - radius, position[1] - radius, position[0] + radius, position[1] + radius]
         in_radius = physics_system.query_bb(bb_list)
         return in_radius
+
+    def clear_rabbits(self):
+        for entity_id in self.entity_ids:
+            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
