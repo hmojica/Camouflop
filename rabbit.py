@@ -29,7 +29,7 @@ class RabbitSystem(GameSystem):
                 self.targeted = rabbit_entity['id']
                 sound_system = self.gameworld.systems['sound_system']
                 Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_diving'))
-            if  self.targeted is not None:
+            if self.targeted is not None:
                 if 'rabbit_system' in entities[self.targeted]:
                     if entities[self.targeted]['rabbit_system']['visibility'] < 800:
                         self.targeted = None

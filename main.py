@@ -90,12 +90,23 @@ class DarkBunnyGame(Widget):
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='pause')
+        self.gameworld.add_state(state_name='credits', systems_added=[],
+            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer',],
+            systems_paused=['cymunk-physics', 'physics_renderer2', 
+            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=[],
+            screenmanager_screen='credits')
 
     def no_impact_collision(self, space, arbiter):
         return False
 
     def start_game(self):
         self.gameworld.state = 'main'
+
+    def pause_game(self):
+        self.gameworld.state = 'pause'
 
     def set_game_over(self):
         self.gameworld.state = 'gameover'
@@ -135,6 +146,9 @@ class DarkBunnyGame(Widget):
 
     def open_settings(self):
         self.gameworld.state = 'settings'
+
+    def open_credits(self):
+        self.gameworld.state = 'credits'
 
     def setup_stuff(self, dt):
         systems = self.gameworld.systems
