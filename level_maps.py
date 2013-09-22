@@ -1,5 +1,25 @@
 class LevelMaps:
     levels = [
+	#level 4
+	{
+	    'dark_bunny': {'position': (.145, .9)},
+            'white_bunnies': [
+                {'position': (.95, .9)}
+            ],
+            'trees': [
+                {'position': (.1, .5), 'type': 'small_tree'},
+                {'position': (.8, .3), 'type': 'small_tree'}
+            ],
+            'rocks': [
+                {'position': (.9, .85), 'type': 'large_rock'},
+                {'position': (.95, .74), 'type': 'large_rock'},
+                {'position': (.98, .8), 'type': 'med_rock'},
+                {'position': (.85, .8), 'type': 'large_rock'},
+            ],
+            'clouds': [],
+            'hole': {'position': (.90, .25)},
+            'wooden_log': [{'position': (.5, .8)}]	
+	},
         #level 1
         {
             'dark_bunny': {'position': (.145, .4)},
