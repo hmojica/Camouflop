@@ -30,7 +30,6 @@ class DarkBunnyGame(Widget):
             print 'failed: rescheduling init'
             Clock.schedule_once(self._init_game)
 
-
     def init_game(self, dt):
         self.setup_states()
         self.setup_map()
