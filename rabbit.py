@@ -85,6 +85,8 @@ class RabbitSystem(GameSystem):
         rabbit_position = rabbit_entity['cymunk-physics']['position']
         hole_position = hole_entity['cymunk-physics']['position']
         Clock.schedule_once(partial(gameworld.timed_remove_entity, rabbit_id))
+        if rabbit_id == self.targeted:
+            self.targeted = None
         if self.rabbit == rabbit_id:
             self.rabbit = None
             time_offset = 5.
