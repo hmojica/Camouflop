@@ -283,6 +283,7 @@ class RabbitSystem(GameSystem):
 
     def clear_rabbits(self):
         self.targeted = None
+        self.white_rabbits = []
         for entity_id in self.entity_ids:
             Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
 
