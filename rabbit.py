@@ -2,16 +2,16 @@ from kivent_cython import GameSystem
 from math import radians, atan2, pi
 from kivy._event import partial
 from kivy.clock import Clock
-from kivy.properties import StringProperty, NumericProperty
+from kivy.properties import StringProperty, NumericProperty, ListProperty, BooleanProperty
 import math
 from kivy.vector import Vector
 
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
     rabbit = NumericProperty(None, allownone=True)
-    white_rabbits = []
-    targeted = None
-    dead_rabbits = False
+    white_rabbits = ListProperty([])
+    targeted = NumericProperty(None, allownone=True)
+    dead_rabbits = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
@@ -280,5 +280,7 @@ class RabbitSystem(GameSystem):
         return in_radius
 
     def clear_rabbits(self):
+        self.targeted = None
         for entity_id in self.entity_ids:
             Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
+
