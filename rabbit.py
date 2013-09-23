@@ -134,7 +134,6 @@ class RabbitSystem(GameSystem):
         return False
 
     def collide_rabbit_and_boundary(self, space, arbiter):
-        print 'collide'
         gameworld = self.gameworld
         entities = gameworld.entities
         boundary_id = arbiter.shapes[1].body.data
@@ -234,19 +233,20 @@ class RabbitSystem(GameSystem):
                 self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
     def apply_rabbit_force(self, rabbit, XDistance, YDistance):
-        self.stop_rabbit(rabbit)
-        rotation = atan2(YDistance, XDistance)
-        body = rabbit['cymunk-physics']['body']
-        body.angle = (rotation) - pi
-        body.angular_velocity = 0
-        unit_vector = body.rotation_vector
-        rabbit_type = rabbit['rabbit_system']['rabbit_type']
-        rabbit_info = self.get_rabbit_dict(rabbit_type)
-        outer_radius = rabbit_info['outer_radius']
-        force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
-        acceleration = rabbit['rabbit_system']['acceleration']
-        force = acceleration * unit_vector[0], acceleration * unit_vector[1]
-        body.apply_force(force, force_offset)
+        if 'rabbit_system' in rabbit:
+            self.stop_rabbit(rabbit)
+            rotation = atan2(YDistance, XDistance)
+            body = rabbit['cymunk-physics']['body']
+            body.angle = (rotation) - pi
+            body.angular_velocity = 0
+            unit_vector = body.rotation_vector
+            rabbit_type = rabbit['rabbit_system']['rabbit_type']
+            rabbit_info = self.get_rabbit_dict(rabbit_type)
+            outer_radius = rabbit_info['outer_radius']
+            force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
+            acceleration = rabbit['rabbit_system']['acceleration']
+            force = acceleration * unit_vector[0], acceleration * unit_vector[1]
+            body.apply_force(force, force_offset)
 
     def stop_rabbit(self, rabbit_entity):
         body = rabbit_entity['cymunk-physics']['body']
