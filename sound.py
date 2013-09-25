@@ -61,7 +61,7 @@ class MusicController(Widget):
     def __init__(self, **kwargs):
         super(MusicController, self).__init__(**kwargs)
         self.music_dict = {}
-        self.track_names = ['rabbittrack1']
+        self.track_names = ['rabbittrack1', 'rabbittrack2', 'rabbittrack3', 'rabbittrack4']
         self.load_music(0)
 
     def on_volume(self, instance, value):
