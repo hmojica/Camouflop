@@ -38,7 +38,7 @@ DarkBunnyGame:
 			gameworld: root.gameworld
 		CymunkPhysics:
 			gameworld: root.gameworld
-			damping: .9
+			damping: .75
 		PhysicsRenderer:
 			gameworld: root.gameworld
 			system_id: 'shadow_renderer'
@@ -117,6 +117,14 @@ DarkBunnyGame:
 			CamouflopButton2:
 				text: 'Pause Game'
 				on_press: app.root.pause_game()
+			
+
+<TimerWidget>:
+	Label:
+		pos: root.pos
+		size: root.size
+		text: 'hi im a label' + str(root.timer_count)
+		color: (0.,0.,0.,1.)
 
 
 <PauseScreen@GameScreen>:

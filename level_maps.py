@@ -25,7 +25,7 @@ class LevelMaps:
                 {'position': (.85, .8), 'type': 'large_rock'},
 		{'position': (.3, .2), 'type': 'med_rock'},
             ],
-            'clouds': [],
+            'clouds': [{'position': (.6, .8), 'type': 'small_feather', 'vel_max': 30, 'ang_vel': .1}],
             'holes': [{'position': (.90, .25)}],
             'wooden_log': []	
 	},

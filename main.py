@@ -22,6 +22,19 @@ class SliderSetting(Widget):
     slider_name = StringProperty('default')
     slider_value = NumericProperty(1.)
 
+class TimerWidget(Widget):
+    timer_count = NumericProperty(0)
+
+    def start_timer(self):
+        Clock.schedule_once(self.increment_timer, 1.0)
+
+    def increment_timer(self, dt):
+        if self.timer_count < 10:
+            self.timer_count += 1
+            Clock.schedule_once(self.increment_timer, 1.0)
+        else:
+            self.timer_count = 0
+        
 
 class MainScreen(GameScreen):
     pass

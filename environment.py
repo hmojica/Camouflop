@@ -31,8 +31,8 @@ class EnvironmentSystem(GameSystem):
         return {'texture': image[0], 'size': (image[1], image[2])}
 
     def add_tree_shadow(self, position, type):
-        x = position[0] + 50
-        y = position[1] - 50
+        x = position[0] + 25
+        y = position[1] - 25
         shadow_renderer = self.get_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': shadow_renderer['size'][0]/2,
         'mass': 100, 'offset': (0, 0)}
@@ -136,7 +136,7 @@ class EnvironmentSystem(GameSystem):
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def add_hole(self, position):
-        shape_dict = {'inner_radius': 0, 'outer_radius': 10,
+        shape_dict = {'inner_radius': 0, 'outer_radius': 20,
         'mass': 100, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 2, 'shape_info': shape_dict, 'friction': 1.0}
@@ -170,8 +170,9 @@ class EnvironmentSystem(GameSystem):
                                   'angle': 0, 'angular_velocity': 0, 'mass': 0, 'vel_limit': 0,
                                   'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
         create_component_dict = {'cymunk-physics': physics_component_dict,
-                                 'physics_renderer': renderer,}
-        component_order = ['cymunk-physics', 'physics_renderer']
+                                 'physics_renderer': renderer,
+                                 'environment_system': {},}
+        component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def clear_objects(self):
