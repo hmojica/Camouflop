@@ -89,7 +89,8 @@ class RabbitSystem(GameSystem):
             self.targeted = None
         if self.rabbit == rabbit_id:
             self.rabbit = None
-            time_offset = 5.
+            time_offset = 10.
+            gameworld.gamescreenmanager.main_screen.add_timer()
             Clock.schedule_once(gameworld.systems['levels_system'].clear_level, time_offset) 
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)

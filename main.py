@@ -22,22 +22,37 @@ class SliderSetting(Widget):
     slider_name = StringProperty('default')
     slider_value = NumericProperty(1.)
 
-class TimerWidget(Widget):
-    timer_count = NumericProperty(0)
+class Timer(Widget):
+    timer_count = NumericProperty(10)
 
     def start_timer(self):
-        Clock.schedule_once(self.increment_timer, 1.0)
+        Clock.schedule_once(self.decrement_timer, 1.0)
 
-    def increment_timer(self, dt):
-        if self.timer_count < 10:
-            self.timer_count += 1
-            Clock.schedule_once(self.increment_timer, 1.0)
+    def decrement_timer(self, dt):
+        if self.timer_count > 0:
+            self.timer_count -= 1
+            Clock.schedule_once(self.decrement_timer, 1.0)
         else:
-            self.timer_count = 0
+            self.timer_count = 10
         
 
 class MainScreen(GameScreen):
-    pass
+    timer = ObjectProperty(None)
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+
+    def add_timer(self):
+        if not self.timer:
+            self.timer = Timer()
+        self.layout.add_widget(self.timer)
+        self.timer.start_timer()
+        Clock.schedule_once(self.remove_timer, 10.)
+        self.timer.pos_hint = {'x': .4, 'y': .4}
+        self.timer.size_hint = (.2, .2)
+
+    def remove_timer(self, dt):
+        self.layout.remove_widget(self.timer)
+
 
 class DarkBunnyGame(Widget):
     

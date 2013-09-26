@@ -89,6 +89,7 @@ DarkBunnyGame:
 			gameworld: root.gameworld
 
 <GameScreenManager>:
+	main_screen: main_screen
 	MainMenuScreen:
 		id: menu_screen
 	MainScreen:
@@ -108,8 +109,8 @@ DarkBunnyGame:
 	FloatLayout:	
 		size: root.size
 		pos: root.pos
+		id: layout
 		BoxLayout:
-			id: layout
 			size_hint: (.2, .1)
 			pos: (0., 0.)
 			orientation: 'vertical'
@@ -119,11 +120,14 @@ DarkBunnyGame:
 				on_press: app.root.pause_game()
 			
 
-<TimerWidget>:
+<Timer>:
+	label: label
+	size_hint: (1., 1.)
 	Label:
+		id: label
 		pos: root.pos
 		size: root.size
-		text: 'hi im a label' + str(root.timer_count)
+		text: 'Next Level Starts In: ' + str(root.timer_count)
 		color: (0.,0.,0.,1.)
 
 
