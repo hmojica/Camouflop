@@ -118,7 +118,21 @@ DarkBunnyGame:
 			CamouflopButton2:
 				text: 'Pause Game'
 				on_press: app.root.pause_game()
-			
+
+<VisibilityBar>:
+	canvas:
+		Color:
+			rgba: (0., 1., 0., .75)
+		Rectangle:
+			size: self.size
+			pos: self.pos
+		Color:
+			rgba: (1., 0., 0., .75)
+		Rectangle:
+			size: self.size[0]*(self.current_visibility/self.max_visibility), self.size[1]
+			pos: self.pos
+		Color:
+			rgba: (1., 1., 1., 1.)
 
 <Timer>:
 	label: label

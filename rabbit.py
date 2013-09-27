@@ -5,6 +5,13 @@ from kivy.clock import Clock
 from kivy.properties import StringProperty, NumericProperty, ListProperty, BooleanProperty
 import math
 from kivy.vector import Vector
+from kivy.uix.widget import Widget
+
+class VisibilityBar(Widget):
+    current_visibility = NumericProperty(0.)
+    max_visibility = NumericProperty(1000.)
+
+
 
 class RabbitSystem(GameSystem):
     system_id = StringProperty('rabbit_system')
@@ -23,7 +30,7 @@ class RabbitSystem(GameSystem):
             rabbit_entity = entities[entity_id]
             if rabbit_entity['rabbit_system']['is_safe'] and rabbit_entity['rabbit_system']['visibility'] > 0:
                 self.change_visibility(entity_id, -1)
-            else:
+            elif rabbit_entity['rabbit_system']['visibility'] <= 1000:
                 self.change_visibility(entity_id, 2)
             if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
                 self.targeted = rabbit_entity['id']
@@ -33,6 +40,7 @@ class RabbitSystem(GameSystem):
                 if 'rabbit_system' in entities[self.targeted]:
                     if entities[self.targeted]['rabbit_system']['visibility'] < 800:
                         self.targeted = None
+            self.update_visibility_widget(rabbit_entity)
 
     def collide_rabbit_with_hawk(self, space, arbiter):
         rabbit_id = arbiter.shapes[0].body.data
@@ -205,8 +213,11 @@ class RabbitSystem(GameSystem):
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
         component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
+        rabbit_visibility_widget = VisibilityBar(current_visibility = 0, size = (75, 10), pos=(-50, -25))
+        self.add_widget(rabbit_visibility_widget)
         rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
-                         'shadow_count': 0, 'acceleration': 1000, 'touch_effect_radius': 5, 'impulse_accel': 250}
+                         'shadow_count': 0, 'acceleration': 1000, 'touch_effect_radius': 5, 'impulse_accel': 250,
+                         'visibility_widget': rabbit_visibility_widget,}
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system,
         'animation_system': animation_system}
@@ -215,6 +226,14 @@ class RabbitSystem(GameSystem):
             self.rabbit = entity_id
         else:
             self.white_rabbits.append(entity_id)
+
+    def update_visibility_widget(self, rabbit_entity):
+        rabbit_system = rabbit_entity['rabbit_system']
+        visibility_widget = rabbit_system['visibility_widget']
+        current_position = rabbit_entity['cymunk-physics']['position']
+        current_visibility = rabbit_system['visibility']
+        visibility_widget.current_visibility = current_visibility
+        visibility_widget.pos = current_position[0] - 40, current_position[1] - 40
 
     def on_touch_down(self, touch):
         if self.gameworld.state == 'main':
@@ -290,4 +309,13 @@ class RabbitSystem(GameSystem):
         self.white_rabbits = []
         for entity_id in self.entity_ids:
             Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
+
+    def remove_entity(self, entity_id):
+        entities = self.gameworld.entities
+        rabbit_entity = entities[entity_id]
+        rabbit_system = rabbit_entity['rabbit_system']
+        visibility_widget = rabbit_system['visibility_widget']
+        self.remove_widget(visibility_widget)
+        rabbit_system['visibility_widget'] = None
+        super(RabbitSystem, self).remove_entity(entity_id)
 

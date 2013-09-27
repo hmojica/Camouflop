@@ -18,6 +18,8 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi, ceil, cos, sin
 
+
+
 class SliderSetting(Widget):
     slider_name = StringProperty('default')
     slider_value = NumericProperty(1.)
@@ -84,7 +86,7 @@ class DarkBunnyGame(Widget):
 
     def setup_states(self):
         self.gameworld.add_state(state_name='main', systems_added=['shadow_renderer', 
-            'physics_renderer2', 'physics_renderer', 
+            'physics_renderer2', 'rabbit_system', 'physics_renderer',
             'tree_physics_renderer', 'hawk_physics_renderer',],
             systems_removed=[],
             systems_paused=[], systems_unpaused=['cymunk-physics', 'physics_renderer2', 
@@ -94,7 +96,7 @@ class DarkBunnyGame(Widget):
             screenmanager_screen='main')
         self.gameworld.add_state(state_name='menu', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer',],
+            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
@@ -102,7 +104,7 @@ class DarkBunnyGame(Widget):
             screenmanager_screen='menu')
         self.gameworld.add_state(state_name='settings', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer',],
+            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
@@ -110,7 +112,7 @@ class DarkBunnyGame(Widget):
             screenmanager_screen='settings')
         self.gameworld.add_state(state_name='gameover', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer',],
+            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
@@ -118,7 +120,7 @@ class DarkBunnyGame(Widget):
             screenmanager_screen='gameover')
         self.gameworld.add_state(state_name='pause', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer',],
+            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
@@ -126,7 +128,7 @@ class DarkBunnyGame(Widget):
             screenmanager_screen='pause')
         self.gameworld.add_state(state_name='credits', systems_added=[],
             systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer',],
+            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
             'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
