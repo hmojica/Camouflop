@@ -237,20 +237,21 @@ class RabbitSystem(GameSystem):
 
     def on_touch_down(self, touch):
         if self.gameworld.state == 'main':
+            sound_system = self.gameworld.systems['sound_system']
             called_rabbit = self.touch_rabbit(touch)
             if not called_rabbit is None:
                 if called_rabbit == self.rabbit:
                     self.stop_rabbit(self.gameworld.entities[called_rabbit])
                 elif self.rabbit is not None:
                     self.call_rabbit(called_rabbit)
-                    sound_system = self.gameworld.systems['sound_system']
-                    Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'))
+                    Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'), .5)
             elif self.rabbit is not None:
                 rabbit = self.gameworld.entities[self.rabbit]
                 rabbit_position = rabbit['cymunk-physics']['position']
                 XDistance =  (rabbit_position[0]) - touch.x
                 YDistance =  (rabbit_position[1]) - touch.y
                 self.apply_rabbit_force(rabbit, XDistance, YDistance)
+                Clock.schedule_once(partial(sound_system.schedule_play, 'rabbit_on_ice'))
 
     def apply_rabbit_force(self, rabbit, XDistance, YDistance):
         if 'rabbit_system' in rabbit:
@@ -288,7 +289,7 @@ class RabbitSystem(GameSystem):
         self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
     def touch_rabbit(self, touch):
-        touch_effect_radius = 5
+        touch_effect_radius = 15
         touch_square = self.query_physics_bb((touch.x, touch.y), touch_effect_radius)
         nonplayer_rabbits = self.white_rabbits
         for entity_id in touch_square:
