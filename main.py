@@ -74,12 +74,17 @@ class Editor(Widget):
                 self.add_rabbit((touch.x, touch.y), self.object_type)
             if self.edit_mode == 'delete':
                 gameworld = self.gameworld
+                entities = gameworld.entities
                 physics_system = gameworld.systems['cymunk-physics']
                 touch_radius = self.touch_radius
                 query_box = [touch.x-touch_radius, touch.y-touch_radius, 
                     touch.x+touch_radius, touch.y+touch_radius]
                 touched = physics_system.query_bb(query_box)
                 for entity_id in touched:
+                    entity = entities[entity_id]
+                    if 'shadow_renderer' in entity and not entity[
+                        'environment_system']['linked_tree'] in touched:
+                            continue
                     Clock.schedule_once(
                         partial(gameworld.timed_remove_entity, entity_id))
 

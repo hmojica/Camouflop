@@ -29,7 +29,7 @@ class EnvironmentSystem(GameSystem):
         image = self.images[type]
         return {'texture': image[0], 'size': (image[1], image[2])}
 
-    def add_tree_shadow(self, position, type):
+    def add_tree_shadow(self, position, type, entity_id):
         offsets = {'small_tree_shadow': (25, -25), 
             'large_tree_shadow': (50, -50), 'med_tree_shadow': (35, -35)}
         offset = offsets[type]
@@ -49,7 +49,7 @@ class EnvironmentSystem(GameSystem):
         'ang_vel_limit': 0,
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
-        'shadow_renderer': shadow_renderer, 'environment_system': {}}
+        'shadow_renderer': shadow_renderer, 'environment_system': {'linked_tree': entity_id}}
         component_order = ['cymunk-physics', 'shadow_renderer', 'environment_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
@@ -111,9 +111,9 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component,
         'tree_physics_renderer': physics_renderer, 'environment_system': {}}
         component_order = ['cymunk-physics', 'tree_physics_renderer', 'environment_system']
-        self.gameworld.init_entity(create_component_dict, component_order)
+        entity_id = self.gameworld.init_entity(create_component_dict, component_order)
         type = type + '_shadow'
-        self.add_tree_shadow(position, type)
+        self.add_tree_shadow(position, type, entity_id)
 
     def add_rock(self, position, type='large_rock'):
         x = position[0]
