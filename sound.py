@@ -13,9 +13,12 @@ class SoundSystem(GameSystem):
     def __init__(self, **kwargs):
         super(SoundSystem, self).__init__(**kwargs)
         self.sound_dict = {}
-        self.sound_names = ['bunny_eats_something', 'bunny_powerup', 'hawk_diving',
-        'hawk_diving', 'hawk_victory', 'rabbit', 'rabbit_in_snow', 'rabbit_on_ice',
-        'rabbit_on_wood', 'rabbit_victory', 'white_rabbits', 'wind_in_the_background', 
+        self.sound_names = ['bunny_eats_something', 
+        'bunny_powerup', 'hawk_diving',
+        'hawk_diving', 'hawk_victory', 'rabbit', 
+        'rabbit_in_snow', 'rabbit_on_ice',
+        'rabbit_on_wood', 'rabbit_victory', 
+        'white_rabbits', 'wind_in_the_background', 
         'hawkcry']
         self.load_music(0)
 
@@ -29,7 +32,8 @@ class SoundSystem(GameSystem):
         sound_dir = self.sound_dir
         reset_sound_position = self.reset_sound_position
         for sound_name in sound_names:
-            sound_dict[sound_name] = SoundLoader.load(sound_dir + sound_name + '.ogg')
+            sound_dict[sound_name] = SoundLoader.load(
+                sound_dir + sound_name + '.ogg')
             sound_dict[sound_name].seek(0)
             sound_dict[sound_name].bind(on_stop=reset_sound_position)
 
@@ -57,22 +61,31 @@ class MusicController(Widget):
     music_dir = StringProperty('assets/music/')
     song_is_playing = BooleanProperty(False)
     volume = NumericProperty(1.)
+    last_track = StringProperty('default')
 
     def __init__(self, **kwargs):
         super(MusicController, self).__init__(**kwargs)
         self.music_dict = {}
-        self.track_names = ['rabbittrack1', 'rabbittrack2', 'rabbittrack3', 'rabbittrack4']
+        self.track_names = ['rabbittrack1', 'rabbittrack2', 
+            'rabbittrack3', 'rabbittrack4']
         self.load_music(0)
 
     def on_volume(self, instance, value):
         for track in self.track_names:
             self.music_dict[track].volume = value
+
+    def choose_new_song(self):
+        song_choice = random.choice(self.track_names)
+        if song_choice == self.last_track:
+            song_choice = self.choose_new_song()
+        return song_choice
         
     def load_music(self, dt):
         track_names = self.track_names
         music_dict = self.music_dict
         for track_name in track_names:
-            music_dict[track_name] = SoundLoader.load(self.music_dir + track_name + '.ogg')
+            music_dict[track_name] = SoundLoader.load(
+                self.music_dir + track_name + '.ogg')
             music_dict[track_name].seek(0)
 
     def check_if_songs_are_playing(self):
@@ -85,7 +98,9 @@ class MusicController(Widget):
 
     def play_new_song(self, dt):
         if not self.check_if_songs_are_playing():
-            self.play(random.choice(self.track_names))
+            song_choice = self.choose_new_song()
+            self.last_track = song_choice
+            self.play(song_choice)
 
     def schedule_choose_new_song(self, value):
         start_delay = random.random() * 20.0
@@ -95,7 +110,8 @@ class MusicController(Widget):
     def play(self, sound_name):
         if sound_name in self.music_dict:
             self.music_dict[sound_name].play()
-            self.music_dict[sound_name].bind(on_stop=self.schedule_choose_new_song)
+            self.music_dict[sound_name].bind(
+                on_stop=self.schedule_choose_new_song)
         else:
             print "file",sound_name,"not found in", self.music_dir
 

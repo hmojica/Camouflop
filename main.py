@@ -9,15 +9,95 @@ import environment
 import sound
 from kivy.app import App
 from kivy.properties import (StringProperty, NumericProperty, 
-    ObjectProperty, ListProperty, BooleanProperty)
+    ObjectProperty, ListProperty, BooleanProperty, DictProperty)
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 import kivent_cython
 from kivent_cython import GameSystem, GameScreen
 from kivy.clock import Clock
 from kivy.core.window import Window
 from math import radians, atan2, degrees, pi, ceil, cos, sin
+from functools import partial
 
+
+class Editor(Widget):
+    edit_mode = StringProperty('no')
+    object_type = StringProperty('none')
+    dark_rabbit_added = BooleanProperty(False)
+    current_entity_list = ObjectProperty(None, allownone=True)
+    entity_layouts = DictProperty({})
+    touch_radius = NumericProperty(10.)
+    trees = ['small_tree', 'med_tree', 'large_tree']
+    rocks = ['small_rock', 'med_rock', 'large_rock']
+
+    def __init__(self, **kwargs):
+        super(Editor, self).__init__(**kwargs)
+        self.setup_buttons()
+
+    def setup_buttons(self):
+        entity_lists = {'place_tree': self.trees, 'place_rock': self.rocks}
+        for entity_group in entity_lists:
+            layout = BoxLayout(orientation='horizontal', size_hint=(.75, .15),
+                pos_hint={'x': .25, 'y': 0.})
+            self.entity_layouts[entity_group] = layout
+            for entity_type in entity_lists[entity_group]:
+                button = Button(text=entity_type, 
+                    on_press=self.set_edit_mode)
+                button.entity_tuple = (entity_type, entity_group)
+                layout.add_widget(button)
+
+    def open_entity_list(self, entity_group):
+        current_selected_widget = self.current_entity_list
+        if current_selected_widget:
+            self.root_layout.remove_widget(current_selected_widget)
+            self.current_entity_list = None
+        if current_selected_widget != self.entity_layouts[entity_group]:
+            layout = self.entity_layouts[entity_group]
+            self.current_entity_list = layout
+            self.root_layout.add_widget(layout)
+
+
+    def set_edit_mode(self, instance):
+        entity_info = instance.entity_tuple
+        self.edit_mode = entity_info[1]
+        self.object_type = entity_info[0]
+
+    def on_touch_down(self, touch):
+        if not super(Editor, self).on_touch_down(touch):
+            if self.edit_mode == 'place_tree':
+                self.add_tree((touch.x, touch.y), self.object_type)
+            if self.edit_mode == 'place_rock':
+                self.add_rock((touch.x, touch.y), self.object_type)
+            if self.edit_mode == 'place_rabbit':
+                self.add_rabbit((touch.x, touch.y), self.object_type)
+            if self.edit_mode == 'delete':
+                gameworld = self.gameworld
+                physics_system = gameworld.systems['cymunk-physics']
+                touch_radius = self.touch_radius
+                query_box = [touch.x-touch_radius, touch.y-touch_radius, 
+                    touch.x+touch_radius, touch.y+touch_radius]
+                touched = physics_system.query_bb(query_box)
+                for entity_id in touched:
+                    Clock.schedule_once(
+                        partial(gameworld.timed_remove_entity, entity_id))
+
+    def add_tree(self, position, tree_type):
+        environment_system = self.gameworld.systems['environment_system']
+        environment_system.add_tree(position, tree_type)
+
+    def add_rock(self, position, rock_type):
+        environment_system = self.gameworld.systems['environment_system']
+        environment_system.add_rock(position, rock_type)
+
+    def add_rabbit(self, position, rabbit_type):
+        if rabbit_type == 'dark_bunny':
+            if not self.dark_rabbit_added:
+                systems = self.gameworld.systems
+                rabbit_system = systems['rabbit_system']
+                rabbit_system.add_rabbit('dark_bunny', position)
+                self.dark_rabbit_added = True
 
 
 class SliderSetting(Widget):
@@ -85,55 +165,77 @@ class DarkBunnyGame(Widget):
         self.gameworld.update(dt)
 
     def setup_states(self):
-        self.gameworld.add_state(state_name='main', systems_added=['shadow_renderer', 
-            'physics_renderer2', 'rabbit_system', 'physics_renderer',
+        self.gameworld.add_state(state_name='main', systems_added=[
+            'physics_renderer2', 
+            'rabbit_system', 'physics_renderer', 'shadow_renderer',
             'tree_physics_renderer', 'hawk_physics_renderer',],
             systems_removed=[],
-            systems_paused=[], systems_unpaused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer',
+            systems_paused=[], systems_unpaused=['cymunk-physics', 
+            'physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer',
             'animation_system', 'shadow_renderer', 'hawk_ai_system', 
             'rabbit_system'],
             screenmanager_screen='main')
         self.gameworld.add_state(state_name='menu', systems_added=[],
-            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
+            systems_removed=['physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='menu')
         self.gameworld.add_state(state_name='settings', systems_added=[],
-            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
+            systems_removed=['physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='settings')
         self.gameworld.add_state(state_name='gameover', systems_added=[],
-            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
+            systems_removed=['physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='gameover')
         self.gameworld.add_state(state_name='pause', systems_added=[],
-            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
+            systems_removed=['physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
+            'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 
             'shadow_renderer', 'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='pause')
         self.gameworld.add_state(state_name='credits', systems_added=[],
-            systems_removed=['physics_renderer2', 'physics_renderer', 'tree_physics_renderer', 
-            'hawk_physics_renderer', 'shadow_renderer', 'rabbit_system'],
+            systems_removed=['physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer', 'rabbit_system'],
             systems_paused=['cymunk-physics', 'physics_renderer2', 
-            'physics_renderer', 'tree_physics_renderer', 'hawk_physics_renderer', 
-            'shadow_renderer', 'animation_system', 'hawk_ai_system', 
+            'physics_renderer', 'tree_physics_renderer', 
+            'hawk_physics_renderer', 'shadow_renderer', 
+            'animation_system', 'hawk_ai_system', 
             'rabbit_system'], systems_unpaused=[],
             screenmanager_screen='credits')
+        self.gameworld.add_state(state_name='editor', systems_added=[
+            'physics_renderer2', 'physics_renderer', 'shadow_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer',],
+            systems_removed=['rabbit_system'],
+            systems_paused=['animation_system', 'hawk_ai_system', 
+            'rabbit_system'], systems_unpaused=['cymunk-physics', 
+            'physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer', 
+            'shadow_renderer',],
+            screenmanager_screen='editor')
 
     def no_impact_collision(self, space, arbiter):
         return False
@@ -144,12 +246,18 @@ class DarkBunnyGame(Widget):
     def pause_game(self):
         self.gameworld.state = 'pause'
 
+    def open_editor(self):
+        systems = self.gameworld.systems
+        levels_system = systems['levels_system']
+        self.gameworld.state = 'editor'
+        levels_system.clear_gameworld_objects()
+
     def set_game_over(self):
         self.gameworld.state = 'gameover'
         systems = self.gameworld.systems
         levels_system = systems['levels_system']
         levels_system.current_level_id = 0
-        Clock.schedule_once(levels_system.generate_next_level)
+        
 
     def setup_collision_callbacks(self):
         systems = self.gameworld.systems
@@ -157,29 +265,50 @@ class DarkBunnyGame(Widget):
         rabbit_system = systems['rabbit_system']
         physics.add_collision_handler(1, 2,
             begin_func=rabbit_system.rabbit_collide_with_hole)
-        physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(1, 10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
-        physics.add_collision_handler(3, 2, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 11, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
-        physics.add_collision_handler(10, 2, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
-        physics.add_collision_handler(10,4,begin_func=self.no_impact_collision)
-        physics.add_collision_handler(1,4, begin_func=rabbit_system.enter_shadow,
-                                      separate_func=rabbit_system.leave_shadow)
-        physics.add_collision_handler(3, 1, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 5, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 4, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(3, 10, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(10, 11, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(1, 3, begin_func=self.no_impact_collision,
-                                      separate_func=rabbit_system.collide_rabbit_with_hawk)
-        physics.add_collision_handler(4, 4, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(5, 4, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(5, 10, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(11, 4, begin_func=self.no_impact_collision)
-        physics.add_collision_handler(2, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            10, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            1, 10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(
+            3, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            3, 10, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            3, 11, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            1, 11, begin_func=rabbit_system.collide_rabbit_and_boundary)
+        physics.add_collision_handler(
+            10, 2, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            1,10, begin_func=rabbit_system.collide_white_rabbit_and_halo)
+        physics.add_collision_handler(
+            10,4,begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            1,4, begin_func=rabbit_system.enter_shadow,
+            separate_func=rabbit_system.leave_shadow)
+        physics.add_collision_handler(
+            3, 1, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            3, 5, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            3, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            3, 10, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            10, 11, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            1, 3, begin_func=self.no_impact_collision,
+            separate_func=rabbit_system.collide_rabbit_with_hawk)
+        physics.add_collision_handler(
+            4, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            5, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            5, 10, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            11, 4, begin_func=self.no_impact_collision)
+        physics.add_collision_handler(
+            2, 4, begin_func=self.no_impact_collision)
 
     def set_state(self):
         self.gameworld.state = 'menu'
@@ -194,9 +323,13 @@ class DarkBunnyGame(Widget):
         systems = self.gameworld.systems
         levels_system = systems['levels_system']
         levels_system.current_level_id = 0
-        Clock.schedule_once(levels_system.generate_next_level)
         self.setup_collision_callbacks()
         self.gameworld.music_controller.play_new_song(30)
+
+    def generate_level(self):
+        systems = self.gameworld.systems
+        levels_system = systems['levels_system']
+        Clock.schedule_once(levels_system.generate_next_level)
 
 
 class DebugPanel(Widget):
@@ -217,4 +350,6 @@ class DarkApp(App):
         pass
 
 if __name__== '__main__':
+
     DarkApp().run()
+

@@ -3,16 +3,15 @@ from kivy.properties import StringProperty
 from kivent_cython import GameSystem, Clock, partial
 
 
-
 class EnvironmentSystem(GameSystem):
     system_id = StringProperty('environment_system')
     images = {
         'small_tree': ('assets/environment/GrnSnwTreSM.png',128,128),
         'med_tree': ('assets/environment/GrnSnwTreMD.png',176,176),
-        'large_tree': ('assets/environment/GrnSnwTreLG.png',224,224),
-        'small_tree_shadow': ('assets/environment/GrnTreShadowSM2.png',128,122),
+        'large_tree': ('assets/environment/GrnSnwTreLG.png', 180, 180),
+        'small_tree_shadow': ('assets/environment/GrnTreShadowSM2.png',164,154),
         'med_tree_shadow': ('assets/environment/GrnTreShadowMD2.png',156,150),
-        'large_tree_shadow': ('assets/environment/GrnTreShadowLG2.png',198,198),
+        'large_tree_shadow': ('assets/environment/GrnTreShadowLG2.png',220,220),
         'small_rock': ('assets/environment/rockSM.png',34,33),
         'med_rock': ('assets/environment/rockMD.png',58,56),
         'large_rock': ('assets/environment/rockLG.png',70,70),
@@ -31,8 +30,11 @@ class EnvironmentSystem(GameSystem):
         return {'texture': image[0], 'size': (image[1], image[2])}
 
     def add_tree_shadow(self, position, type):
-        x = position[0] + 25
-        y = position[1] - 25
+        offsets = {'small_tree_shadow': (25, -25), 
+            'large_tree_shadow': (50, -50), 'med_tree_shadow': (35, -35)}
+        offset = offsets[type]
+        x = position[0] + offset[0]
+        y = position[1] + offset[1]
         shadow_renderer = self.get_renderer(type)
         shape_dict = {'inner_radius': 0, 'outer_radius': shadow_renderer['size'][0]/2,
         'mass': 100, 'offset': (0, 0)}

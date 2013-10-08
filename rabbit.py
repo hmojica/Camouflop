@@ -28,30 +28,36 @@ class RabbitSystem(GameSystem):
         for entity_id in self.entity_ids:
             entities = self.gameworld.entities
             rabbit_entity = entities[entity_id]
-            if rabbit_entity['rabbit_system']['is_safe'] and rabbit_entity['rabbit_system']['visibility'] > 0:
+            if (rabbit_entity['rabbit_system']['is_safe'] and 
+                rabbit_entity['rabbit_system']['visibility'] > 0):
                 self.change_visibility(entity_id, -1)
             elif rabbit_entity['rabbit_system']['visibility'] <= 1000:
                 self.change_visibility(entity_id, 2)
-            if rabbit_entity['rabbit_system']['visibility'] > 1000 and self.targeted is None:
+            if (rabbit_entity['rabbit_system']['visibility'] > 1000 and 
+                self.targeted is None):
                 self.targeted = rabbit_entity['id']
                 sound_system = self.gameworld.systems['sound_system']
-                Clock.schedule_once(partial(sound_system.schedule_play, 'hawkcry'))
+                Clock.schedule_once(
+                    partial(sound_system.schedule_play, 'hawkcry'))
             if self.targeted is not None:
                 if 'rabbit_system' in entities[self.targeted]:
-                    if entities[self.targeted]['rabbit_system']['visibility'] < 800:
+                    if entities[self.targeted][
+                        'rabbit_system']['visibility'] < 800:
                         self.targeted = None
             self.update_visibility_widget(rabbit_entity)
 
     def collide_rabbit_with_hawk(self, space, arbiter):
         rabbit_id = arbiter.shapes[0].body.data
         if rabbit_id == self.targeted:
-            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, self.targeted))
+            sound_system = self.gameworld.systems['sound_system']
+            Clock.schedule_once(
+                partial(self.gameworld.timed_remove_entity, self.targeted))
+            Clock.schedule_once(
+                partial(sound_system.schedule_play, 'rabbit_on_ice'))
             self.dead_rabbits = True
             if self.rabbit == self.targeted:
                 self.rabbit = None
-                self.gameworld.parent.set_game_over()
-                sound_system = self.gameworld.systems['sound_system']
-                Clock.schedule_once(partial(sound_system.schedule_play, 'hawk_victory'))
+                self.gameworld.parent.set_game_over()    
             elif self.targeted in self.white_rabbits:
                 self.white_rabbits.remove(self.targeted)
             self.targeted = None
@@ -99,12 +105,14 @@ class RabbitSystem(GameSystem):
             self.rabbit = None
             time_offset = 10.
             gameworld.gamescreenmanager.main_screen.add_timer()
-            Clock.schedule_once(gameworld.systems['levels_system'].clear_level, time_offset) 
+            Clock.schedule_once(
+                gameworld.systems['levels_system'].clear_level, time_offset) 
         elif rabbit_id in self.white_rabbits:
             self.white_rabbits.remove(rabbit_id)
         if self.rabbit == None and self.white_rabbits == []:
             sound_system = gameworld.systems['sound_system']
-            Clock.schedule_once(partial(sound_system.schedule_play, 'rabbit_victory'))
+            Clock.schedule_once(
+                partial(sound_system.schedule_play, 'rabbit_victory'))
         return False
 
     def enter_shadow(self, space, arbiter):
@@ -121,10 +129,9 @@ class RabbitSystem(GameSystem):
             or (rabbit_system['shadow_count'] == 0 and not is_black)
         if has_camouflage:
             rabbit_system['is_safe'] = True
-            print [rabbit_entity, ' is safe', rabbit_system['visibility']]
         elif not rabbit_system['in_log']:
             rabbit_system['is_safe'] = False
-            print [rabbit_entity, ' is in danger', rabbit_system['visibility']]
+
 
     def leave_shadow(self, space, arbiter):
         rabbit_id = arbiter.shapes[0].body.data
@@ -156,52 +163,55 @@ class RabbitSystem(GameSystem):
 
     def get_rabbit_dict(self, rabbit_type):
         if rabbit_type == 'white_rabbit':
-            white_rabbit_physics_renderer = dict(texture='assets/white_rabbit/WR1.png', size=(64, 64))
-            white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
-            '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
-            'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
+            white_rabbit_physics_renderer = {
+            'texture': 'assets/white_rabbit/WR1.png', 'size': (64, 64)}
+            white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', 
+            '1': 'assets/white_rabbit/WR2.png',
+            '2': 'assets/white_rabbit/WR3.png', 
+            '3': 'assets/white_rabbit/WR4.png',
+            '4': 'assets/white_rabbit/WR5.png', 
+            '5': 'assets/white_rabbit/WR6.png', 
+            'time_between_frames': .18, 'current_frame': 0,
             'current_frame_time': 0., 'number_of_frames': 6}
-            return {'outer_radius': 16, 'mass': 35,
+            return {'outer_radius': 12, 'mass': 35,
                     'angle': 0, 'vel_limit': 250,
                     'physics_renderer': white_rabbit_physics_renderer,
                     'anim_state': white_rabbit_anim_dict}
         else:
-            dark_bunny_physics_renderer = dict(texture='assets/black_rabbit/BR1.png', size=(64, 64))
-            black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
-                '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
-                'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
+            dark_bunny_physics_renderer = {
+                'texture': 'assets/black_rabbit/BR1.png', 'size': (64, 64)}
+            black_rabbit_anim_dict = {
+                '0': 'assets/black_rabbit/BR1.png', 
+                '1': 'assets/black_rabbit/BR2.png',
+                '2': 'assets/black_rabbit/BR3.png', 
+                '3': 'assets/black_rabbit/BR4.png',
+                '4':'assets/black_rabbit/BR5.png', 
+                '5': 'assets/black_rabbit/BR6.png', 
+                'time_between_frames': .2, 'current_frame': 0,
                 'current_frame_time': 0., 'number_of_frames': 6}
-            return {'outer_radius': 18, 'mass': 50,
-                    'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
+            return {'outer_radius': 16, 'mass': 50,
+                    'angle': 0, 'vel_limit': 250, 
+                    'physics_renderer': dark_bunny_physics_renderer,
                     'anim_state': black_rabbit_anim_dict}
 
 
     def add_rabbit(self, rabbit_type, position):
         rabbit_info = self.get_rabbit_dict(rabbit_type)
-        # if rabbit_type == 'white_rabbit':
-        #     white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-        #     white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
-        #     '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
-        #     'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
-        #     'current_frame_time': 0., 'number_of_frames': 6}
-        #     rabbit_info = {'outer_radius': 16, 'mass': 35,
-        #                                 'angle': 0, 'vel_limit': 250,
-        #                                 'physics_renderer': white_rabbit_physics_renderer,
-        #                                 'anim_state': white_rabbit_anim_dict}
-        # else:
-        #     rabbit_info = self.rabbit_dicts[rabbit_type]
         x = position[0]
         y = position[1]
-        shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'],
+        shape_dict = {'inner_radius': 0, 
+            'outer_radius': rabbit_info['outer_radius'],
             'mass': rabbit_info['mass'], 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .5,
         'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
         if rabbit_type == 'dark_bunny':
-            charisma_halo_shape_dict = {'inner_radius': 0, 'outer_radius': rabbit_info['outer_radius'] + 20,
+            charisma_halo_shape_dict = {'inner_radius': 0, 
+            'outer_radius': rabbit_info['outer_radius'] + 20,
             'mass': rabbit_info['mass'], 'offset': (0, 0)}
-            charisma_halo = dict(shape_type='circle', elasticity=.5, collision_type=10,
-                                 shape_info=charisma_halo_shape_dict, friction=1.0)
+            charisma_halo = {'shape_type': 'circle', 'elasticity': .5, 
+                'collision_type': 10, 'shape_info': charisma_halo_shape_dict, 
+                'friction': 1.0}
             col_shapes.append(charisma_halo)
         physics_component = {'main_shape': 'circle',
         'velocity': (0, 0),
@@ -210,18 +220,25 @@ class RabbitSystem(GameSystem):
         'vel_limit': rabbit_info['vel_limit'],
         'ang_vel_limit': radians(200),
         'mass': 50, 'col_shapes': col_shapes}
-        animation_system = {'states': {'running': rabbit_info['anim_state']}, 'current_state': 'running'}
-        component_order = ['cymunk-physics', 'physics_renderer', 'rabbit_system', 'animation_system']
+        animation_system = {'states': {'running': rabbit_info['anim_state']}, 
+            'current_state': 'running'}
+        component_order = ['cymunk-physics', 'physics_renderer', 
+            'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
-        rabbit_visibility_widget = VisibilityBar(current_visibility = 0, size = (75, 10), pos=(-50, -25))
+        rabbit_visibility_widget = VisibilityBar(
+            current_visibility = 0, size = (75, 10), pos=(-50, -25))
         self.add_widget(rabbit_visibility_widget)
-        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 'is_safe': is_safe, 'in_log': False,
-                         'shadow_count': 0, 'acceleration': 1000, 'touch_effect_radius': 5, 'impulse_accel': 250,
+        rabbit_system = {'rabbit_type': rabbit_type, 'visibility': 0, 
+                         'is_safe': is_safe, 'in_log': False,
+                         'shadow_count': 0, 'acceleration': 1000, 
+                         'touch_effect_radius': 5, 'impulse_accel': 250,
                          'visibility_widget': rabbit_visibility_widget,}
         create_component_dict = {'cymunk-physics': physics_component,
-        'physics_renderer': rabbit_info['physics_renderer'], 'rabbit_system': rabbit_system,
-        'animation_system': animation_system}
-        entity_id = self.gameworld.init_entity(create_component_dict, component_order)
+            'physics_renderer': rabbit_info['physics_renderer'], 
+            'rabbit_system': rabbit_system,
+            'animation_system': animation_system}
+        entity_id = self.gameworld.init_entity(
+                        create_component_dict, component_order)
         if rabbit_type == 'dark_bunny':
             self.rabbit = entity_id
         else:
@@ -233,17 +250,18 @@ class RabbitSystem(GameSystem):
         current_position = rabbit_entity['cymunk-physics']['position']
         current_visibility = rabbit_system['visibility']
         visibility_widget.current_visibility = current_visibility
-        visibility_widget.pos = current_position[0] - 40, current_position[1] - 40
+        visibility_widget.pos = (current_position[0] - 40, 
+            current_position[1] - 40)
 
     def on_touch_down(self, touch):
         if self.gameworld.state == 'main':
-            sound_system = self.gameworld.systems['sound_system']
             called_rabbit = self.touch_rabbit(touch)
             if not called_rabbit is None:
                 if called_rabbit == self.rabbit:
                     self.stop_rabbit(self.gameworld.entities[called_rabbit])
                 elif self.rabbit is not None:
                     self.call_rabbit(called_rabbit)
+                    sound_system = self.gameworld.systems['sound_system']
                     Clock.schedule_once(partial(sound_system.schedule_play, 'white_rabbits'), .5)
             elif self.rabbit is not None:
                 rabbit = self.gameworld.entities[self.rabbit]
@@ -251,7 +269,6 @@ class RabbitSystem(GameSystem):
                 XDistance =  (rabbit_position[0]) - touch.x
                 YDistance =  (rabbit_position[1]) - touch.y
                 self.apply_rabbit_force(rabbit, XDistance, YDistance)
-                Clock.schedule_once(partial(sound_system.schedule_play, 'rabbit_on_ice'))
 
     def apply_rabbit_force(self, rabbit, XDistance, YDistance):
         if 'rabbit_system' in rabbit:
@@ -264,11 +281,14 @@ class RabbitSystem(GameSystem):
             rabbit_type = rabbit['rabbit_system']['rabbit_type']
             rabbit_info = self.get_rabbit_dict(rabbit_type)
             outer_radius = rabbit_info['outer_radius']
-            force_offset = unit_vector[0] * -1 * outer_radius, unit_vector[1] * -1 * outer_radius
+            force_offset = (unit_vector[0] * -1 * outer_radius, 
+                unit_vector[1] * -1 * outer_radius)
             acceleration = rabbit['rabbit_system']['acceleration']
             impulse_accel = rabbit['rabbit_system']['impulse_accel']
-            force = acceleration * unit_vector[0], acceleration * unit_vector[1]
-            impulse_force = impulse_accel * unit_vector[0], impulse_accel * unit_vector[1]
+            force = (acceleration * unit_vector[0], 
+                acceleration * unit_vector[1])
+            impulse_force = (impulse_accel * unit_vector[0], 
+                impulse_accel * unit_vector[1])
             body.apply_impulse(force, force_offset)
             body.apply_force(force, force_offset)
 
@@ -289,8 +309,9 @@ class RabbitSystem(GameSystem):
         self.apply_rabbit_force(rabbit, XDistance, YDistance)
 
     def touch_rabbit(self, touch):
-        touch_effect_radius = 15
-        touch_square = self.query_physics_bb((touch.x, touch.y), touch_effect_radius)
+        touch_effect_radius = 16
+        touch_square = self.query_physics_bb(
+                (touch.x, touch.y), touch_effect_radius)
         nonplayer_rabbits = self.white_rabbits
         for entity_id in touch_square:
             if entity_id == self.rabbit:
@@ -301,7 +322,8 @@ class RabbitSystem(GameSystem):
 
     def query_physics_bb(self, position, radius):
         physics_system = self.gameworld.systems['cymunk-physics']
-        bb_list = [position[0] - radius, position[1] - radius, position[0] + radius, position[1] + radius]
+        bb_list = [position[0] - radius, position[1] - radius, 
+            position[0] + radius, position[1] + radius]
         in_radius = physics_system.query_bb(bb_list)
         return in_radius
 
@@ -309,7 +331,8 @@ class RabbitSystem(GameSystem):
         self.targeted = None
         self.white_rabbits = []
         for entity_id in self.entity_ids:
-            Clock.schedule_once(partial(self.gameworld.timed_remove_entity, entity_id))
+            Clock.schedule_once(
+                partial(self.gameworld.timed_remove_entity, entity_id))
 
     def remove_entity(self, entity_id):
         entities = self.gameworld.entities

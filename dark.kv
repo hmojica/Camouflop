@@ -89,11 +89,15 @@ DarkBunnyGame:
 			gameworld: root.gameworld
 
 <GameScreenManager>:
+	gameworld: root.gameworld
 	main_screen: main_screen
 	MainMenuScreen:
 		id: menu_screen
 	MainScreen:
 		id: main_screen
+	EditorScreen:
+		id: editor_screen
+		gameworld: root.gameworld
 	SettingsScreen:
 		id: setting_screen
 	GameOverScreen:
@@ -187,6 +191,45 @@ DarkBunnyGame:
 		size: root.size
 		pos: root.pos
 		MainMenu:
+
+<EditorScreen@GameScreen>:
+	name: 'editor'
+	gameworld: root.gameworld
+	FloatLayout:
+		size: root.size
+		pos: root.pos
+		Editor:
+			gameworld: root.gameworld
+
+<Editor>:
+	root_layout: root_layout
+	FloatLayout:
+		id: root_layout
+		size: root.size
+		pos: root.pos
+		BoxLayout:
+			size_hint: (.25, .3)
+			padding: 5
+			spacing: 5
+			orientation: 'vertical'
+			CamouflopButton:
+				text: 'Main Menu'
+				on_press: app.root.set_state()
+			CamouflopButton:
+				text: 'Play Game'
+				on_press: app.root.start_game()
+			CamouflopButton:
+				text: 'Trees'
+				on_press: root.open_entity_list('place_tree')
+			CamouflopButton:
+				text: 'Rocks'
+				on_press: root.open_entity_list('place_rock')
+			CamouflopButton:
+				text: 'Delete'
+				on_press: root.edit_mode = 'delete'
+	
+
+
 
 <SliderSetting@Widget>:
 	slider_name: self.slider_name
@@ -309,10 +352,13 @@ DarkBunnyGame:
 				spacing: 10
 				CamouflopButton:
 					text: 'Play Game'
-					on_press: app.root.start_game()
+					on_press: app.root.start_game(), app.root.generate_level()
 				CamouflopButton:
 					text: 'Settings'
 					on_press: app.root.open_settings()
+				CamouflopButton:
+					text: 'Level Editor'
+					on_press: app.root.open_editor()
 				CamouflopButton:
 					text: 'Credits'
 					on_press: app.root.open_credits()
