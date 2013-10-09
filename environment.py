@@ -25,6 +25,11 @@ class EnvironmentSystem(GameSystem):
         'snow_hill_b': ('assets/environment/SnowHillB.png',160,100)
     }
 
+    def create_component(self, entity_id, entity_component_dict):
+        entity_component_dict['color'] = (1., 1., 1., 1.)
+
+        super(EnvironmentSystem, self).create_component(entity_id, entity_component_dict)
+
     def get_renderer(self, type):
         image = self.images[type]
         return {'texture': image[0], 'size': (image[1], image[2])}
@@ -152,9 +157,10 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer2': {'texture':
-            'assets/environment/RabbitHole.png', 'size': (80, 80)}, 'environment_system': {}}
+            'assets/environment/RabbitHole.png', 'size': (80, 80)}, 'environment_system': {'hole': True}}
         component_order = ['cymunk-physics', 'physics_renderer2', 'environment_system']
-        self.gameworld.init_entity(create_component_dict, component_order)
+        entity_id = self.gameworld.init_entity(create_component_dict, component_order)
+        return entity_id
 
     def get_wooden_log_renderer(self, type):
         if type == 'log':

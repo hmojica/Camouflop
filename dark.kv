@@ -8,7 +8,7 @@ DarkBunnyGame:
 	size: root.size
 	canvas:
 		Color:
-			rgb: (1., 1., 1.)
+			rgb: (0., 0., 0.)
 		Rectangle:
 			size: self.size
 			pos: self.pos
@@ -20,15 +20,25 @@ DarkBunnyGame:
 		environment_system: environment_system
 		music_controller: music_controller
 		GameView:
+			id: game_view
 			focus_entity: False
-			updateable: False
+			entity_to_focus: rabbit_system.rabbit
 			gameworld: root.gameworld
 			pos: root.pos
 			size: root.size
 		GameMap:
 			system_id: 'map'
-			map_size: root.size
+			camera_pos: game_view.camera_pos
+			map_size: (1000., 700.)
+			margins: (100., 100.)
 			gameworld: root.gameworld
+			size: root.size
+			canvas:
+				Color:
+					rgba: self.map_color
+				Rectangle:
+					pos: self.camera_pos
+					size: self.map_size
 		MusicController:
 			volume: app.music_level
             id: music_controller
@@ -36,17 +46,25 @@ DarkBunnyGame:
 			system_id: 'quadtree_renderer'
 			render_information_from: 'position'
 			gameworld: root.gameworld
+			do_color: True
+			context_information_from: 'environment_system'
 		CymunkPhysics:
 			gameworld: root.gameworld
 			damping: .75
 		PhysicsRenderer:
 			gameworld: root.gameworld
 			system_id: 'shadow_renderer'
+			do_color: True
+			context_information_from: 'environment_system'
 		PhysicsRenderer:
 			gameworld: root.gameworld
 			system_id: 'physics_renderer2'
+			do_color: True
+			context_information_from: 'environment_system'
 		PhysicsRenderer:
 			gameworld: root.gameworld
+			do_color: True
+			context_information_from: 'environment_system'
 		GameSystem:
 			system_id: 'position'
 			gameworld: root.gameworld
@@ -58,15 +76,20 @@ DarkBunnyGame:
 		PhysicsRenderer:
 			gameworld: root.gameworld
 			system_id: 'tree_physics_renderer'
+			do_color: True
+			context_information_from: 'environment_system'
 		PhysicsRenderer:
 	        gameworld: root.gameworld
 	        system_id: 'hawk_physics_renderer'
+	        do_color: True
+			context_information_from: 'environment_system'
 	    HawkAISystem:
 	        id: hawk_ai_system
 			system_id: 'hawk_ai_system'
 			gameworld: root.gameworld
 			update_time: 1./30.
 		RabbitSystem:
+			id: rabbit_system
 			gameworld: root.gameworld
 			updateable: True
 			update_time: 1./30.
@@ -148,7 +171,6 @@ DarkBunnyGame:
 		text: 'Next Level Starts In: ' + str(root.timer_count)
 		color: (0.,0.,0.,1.)
 
-
 <PauseScreen@GameScreen>:
 	name: 'pause'
 	BoxLayout:
@@ -187,6 +209,12 @@ DarkBunnyGame:
 
 <MainMenuScreen@GameScreen>:
 	name: 'menu'
+	canvas:
+		Color:
+			rgba: (1., 1., 1., 1.)
+		Rectangle:
+			size: self.size
+			pos: self.pos
 	FloatLayout:
 		size: root.size
 		pos: root.pos
@@ -208,7 +236,7 @@ DarkBunnyGame:
 		size: root.size
 		pos: root.pos
 		BoxLayout:
-			size_hint: (.25, .3)
+			size_hint: (.25, .5)
 			padding: 5
 			spacing: 5
 			orientation: 'vertical'
@@ -219,17 +247,26 @@ DarkBunnyGame:
 				text: 'Play Game'
 				on_press: app.root.start_game()
 			CamouflopButton:
+				text: 'Clouds'
+				on_press: root.open_entity_list('place_clouds')
+			CamouflopButton:
 				text: 'Trees'
 				on_press: root.open_entity_list('place_tree')
 			CamouflopButton:
 				text: 'Rocks'
 				on_press: root.open_entity_list('place_rock')
 			CamouflopButton:
+				text: 'Rabbits'
+				on_press: root.open_entity_list('place_rabbit')
+			CamouflopButton:
+				text: 'Holes'
+				on_press: root.open_entity_list('place_hole')
+			CamouflopButton:
 				text: 'Delete'
 				on_press: root.edit_mode = 'delete'
-	
-
-
+			CamouflopButton:
+				text: 'Move'
+				on_press: root.edit_mode = 'move'
 
 <SliderSetting@Widget>:
 	slider_name: self.slider_name

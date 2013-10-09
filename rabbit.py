@@ -22,7 +22,6 @@ class RabbitSystem(GameSystem):
 
     def __init__(self, **kwargs):
         super(RabbitSystem, self).__init__(**kwargs)
-        # self.setup_rabbit_dicts()
 
     def update(self, dt):
         for entity_id in self.entity_ids:
@@ -69,25 +68,6 @@ class RabbitSystem(GameSystem):
         rabbit_visibility = rabbit_entity['rabbit_system']['visibility']
         rabbit_visibility = rabbit_visibility + amount
         rabbit_entity['rabbit_system']['visibility'] = rabbit_visibility
-
-    # def setup_rabbit_dicts(self):
-    #     self.rabbit_dicts = rabbit_dicts = {}
-    #     dark_bunny_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-    #     white_rabbit_physics_renderer = dict(texture='rabbit.png', size=(64, 64))
-    #     white_rabbit_anim_dict = {'0': 'assets/white_rabbit/WR1.png', '1': 'assets/white_rabbit/WR2.png',
-    #     '2': 'assets/white_rabbit/WR3.png', '3': 'assets/white_rabbit/WR4.png','4':
-    #     'assets/white_rabbit/WR5.png', '5': 'assets/white_rabbit/WR6.png', 'time_between_frames': .18, 'current_frame': 0,
-    #     'current_frame_time': 0., 'number_of_frames': 6}
-    #     black_rabbit_anim_dict = {'0': 'assets/black_rabbit/BR1.png', '1': 'assets/black_rabbit/BR2.png',
-    #     '2': 'assets/black_rabbit/BR3.png', '3': 'assets/black_rabbit/BR4.png','4':
-    #     'assets/black_rabbit/BR5.png', '5': 'assets/black_rabbit/BR6.png', 'time_between_frames': .2, 'current_frame': 0,
-    #     'current_frame_time': 0., 'number_of_frames': 6}
-    #     rabbit_dicts['dark_bunny'] = {'outer_radius': 18, 'mass': 50,
-    #                                   'angle': 0, 'vel_limit': 250, 'physics_renderer': dark_bunny_physics_renderer,
-    #                                   'anim_state': black_rabbit_anim_dict}
-        # rabbit_dicts['white_rabbit'] = {'outer_radius': 16, 'mass': 35,
-        #                                 'angle': 0, 'vel_limit': 250, 'physics_renderer': white_rabbit_physics_renderer,
-        #                                 'anim_state': white_rabbit_anim_dict}
 
     def rabbit_collide_with_hole(self, space, arbiter):
         gameworld = self.gameworld
@@ -156,9 +136,6 @@ class RabbitSystem(GameSystem):
         rabbit_id = arbiter.shapes[0].body.data
         rabbit_entity = entities[rabbit_id]
         rabbit_body = rabbit_entity['cymunk-physics']['body']
-        #rabbit_body.reset_forces()
-        #rabbit_body.velocity = (0, 0)
-        #rabbit_body.angular_velocity = (0, 0)
         return True
 
     def get_rabbit_dict(self, rabbit_type):
@@ -223,7 +200,7 @@ class RabbitSystem(GameSystem):
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 
             'current_state': 'running'}
         component_order = ['cymunk-physics', 'physics_renderer', 
-            'rabbit_system', 'animation_system']
+            'rabbit_system', 'animation_system' ,'environment_system']
         is_safe = not rabbit_type == 'dark_bunny'
         rabbit_visibility_widget = VisibilityBar(
             current_visibility = 0, size = (75, 10), pos=(-50, -25))
@@ -236,24 +213,29 @@ class RabbitSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component,
             'physics_renderer': rabbit_info['physics_renderer'], 
             'rabbit_system': rabbit_system,
-            'animation_system': animation_system}
+            'animation_system': animation_system, 'environment_system': {}}
         entity_id = self.gameworld.init_entity(
                         create_component_dict, component_order)
         if rabbit_type == 'dark_bunny':
             self.rabbit = entity_id
         else:
             self.white_rabbits.append(entity_id)
+        return entity_id
 
     def update_visibility_widget(self, rabbit_entity):
         rabbit_system = rabbit_entity['rabbit_system']
+        camera_pos = self.gameworld.systems['default_gameview'].camera_pos
         visibility_widget = rabbit_system['visibility_widget']
         current_position = rabbit_entity['cymunk-physics']['position']
         current_visibility = rabbit_system['visibility']
         visibility_widget.current_visibility = current_visibility
-        visibility_widget.pos = (current_position[0] - 40, 
-            current_position[1] - 40)
+        visibility_widget.pos = (current_position[0] + camera_pos[0] - 40, 
+            current_position[1] + camera_pos[1] - 40)
 
     def on_touch_down(self, touch):
+        camera_pos = self.gameworld.systems['default_gameview'].camera_pos
+        touch.x -= camera_pos[0]
+        touch.y -= camera_pos[1]
         if self.gameworld.state == 'main':
             called_rabbit = self.touch_rabbit(touch)
             if not called_rabbit is None:
