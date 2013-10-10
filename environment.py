@@ -55,7 +55,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'shadow_renderer': shadow_renderer, 'environment_system': {'linked_tree': entity_id}}
-        component_order = ['cymunk-physics', 'shadow_renderer', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'shadow_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def get_cloud_renderer(self, type):
@@ -85,7 +85,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 100, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'hawk_physics_renderer': renderer, 'environment_system': {}}
-        component_order = ['cymunk-physics', 'hawk_physics_renderer', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'hawk_physics_renderer']
         cloud_id = self.gameworld.init_entity(create_component_dict, component_order)
         cloud = self.gameworld.entities[cloud_id]
         physics_data = cloud['cymunk-physics']
@@ -115,7 +115,7 @@ class EnvironmentSystem(GameSystem):
         'mass': 0, 'col_shapes': col_shapes}
         create_component_dict = {'cymunk-physics': physics_component,
         'tree_physics_renderer': physics_renderer, 'environment_system': {}}
-        component_order = ['cymunk-physics', 'tree_physics_renderer', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'tree_physics_renderer']
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
         type = type + '_shadow'
         self.add_tree_shadow(position, type, entity_id)
@@ -133,7 +133,7 @@ class EnvironmentSystem(GameSystem):
                                   'ang_vel_limit': 0, 'mass': 0, 'col_shapes': [col_shape_dict]}
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer, 'environment_system': {}}
-        component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def load_snowtexture(self, type, position):
@@ -158,7 +158,7 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component,
         'physics_renderer2': {'texture':
             'assets/environment/RabbitHole.png', 'size': (80, 80)}, 'environment_system': {'hole': True}}
-        component_order = ['cymunk-physics', 'physics_renderer2', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'physics_renderer2']
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
         return entity_id
 
@@ -180,7 +180,7 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer,
                                  'environment_system': {},}
-        component_order = ['cymunk-physics', 'physics_renderer', 'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 'physics_renderer']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def clear_objects(self):

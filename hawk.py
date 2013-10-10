@@ -215,8 +215,9 @@ class HawkAISystem(GameSystem):
         'turn_speed_multiplier': 0, 'engine_speed_multiplier': 0}
         create_component_dict = {'cymunk-physics': physics_component_dict,
         'hawk_physics_renderer': {'texture': 'assets/hawk/HawkLG.png', 'size': (hawk_width, hawk_height)},
-        'hawk_ai_system': hawk_ai_system}
-        component_order = ['cymunk-physics', 'hawk_physics_renderer', 'hawk_ai_system']
+        'hawk_ai_system': hawk_ai_system, 'environment_system': {}}
+        component_order = ['cymunk-physics', 'environment_system', 
+            'hawk_physics_renderer', 'hawk_ai_system']
         self.gameworld.init_entity(create_component_dict, component_order)
 
     def clear_hawk(self):

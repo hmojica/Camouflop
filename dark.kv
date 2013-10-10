@@ -29,8 +29,8 @@ DarkBunnyGame:
 		GameMap:
 			system_id: 'map'
 			camera_pos: game_view.camera_pos
-			map_size: (1000., 700.)
-			margins: (100., 100.)
+			map_size: (1000, 700)
+			default_margins: (100., 100.)
 			gameworld: root.gameworld
 			size: root.size
 			canvas:
@@ -229,6 +229,35 @@ DarkBunnyGame:
 		Editor:
 			gameworld: root.gameworld
 
+		
+<MapSizeChooser>:
+	layout: layout
+	text_color: (0., 0., 0., 1.)
+	BoxLayout:
+		orientation: 'vertical'
+		size: root.size
+		pos: root.pos
+		id: layout
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (1., .3)
+			Label:
+				text: 'Width: ' + str(root.current_map_width)
+				color: root.text_color
+				size_hint: (.4, 1.)
+				on_touch_down: root.add_numpad('width') if self.collide_point(args[1].x, args[1].y) else None
+			Label:
+				text: ' x '
+				color: root.text_color
+				size_hint: (.2, 1.)
+			Label:
+				text: 'Height: ' + str(root.current_map_height)
+				color: root.text_color
+				size_hint: (.4, 1.)
+				on_touch_down: root.add_numpad('height') if self.collide_point(args[1].x, args[1].y) else None
+				
+
+
 <Editor>:
 	root_layout: root_layout
 	FloatLayout:
@@ -267,6 +296,12 @@ DarkBunnyGame:
 			CamouflopButton:
 				text: 'Move'
 				on_press: root.edit_mode = 'move'
+			CamouflopButton:
+				text: 'Free Look'
+				on_press: root.edit_mode = 'freelook'
+			CamouflopButton:
+				text: 'Map Size'
+				on_press: root.open_map_size_picker()
 
 <SliderSetting@Widget>:
 	slider_name: self.slider_name

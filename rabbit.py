@@ -199,8 +199,8 @@ class RabbitSystem(GameSystem):
         'mass': 50, 'col_shapes': col_shapes}
         animation_system = {'states': {'running': rabbit_info['anim_state']}, 
             'current_state': 'running'}
-        component_order = ['cymunk-physics', 'physics_renderer', 
-            'rabbit_system', 'animation_system' ,'environment_system']
+        component_order = ['cymunk-physics', 'environment_system', 
+            'physics_renderer', 'rabbit_system', 'animation_system']
         is_safe = not rabbit_type == 'dark_bunny'
         rabbit_visibility_widget = VisibilityBar(
             current_visibility = 0, size = (75, 10), pos=(-50, -25))
