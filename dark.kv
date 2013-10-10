@@ -118,6 +118,8 @@ DarkBunnyGame:
 		id: menu_screen
 	MainScreen:
 		id: main_screen
+	MainScreen2:
+		id: main_Screen_editor
 	EditorScreen:
 		id: editor_screen
 		gameworld: root.gameworld
@@ -145,6 +147,22 @@ DarkBunnyGame:
 			CamouflopButton2:
 				text: 'Pause Game'
 				on_press: app.root.pause_game()
+
+<MainScreen2@MainScreen>:
+	name: 'main_editor'
+	layout: layout
+	FloatLayout:	
+		size: root.size
+		pos: root.pos
+		id: layout
+		BoxLayout:
+			size_hint: (.2, .1)
+			pos: (0., 0.)
+			orientation: 'vertical'
+			DebugPanel:
+			CamouflopButton2:
+				text: 'Return to Editor'
+				on_press: app.root.open_editor()
 
 <VisibilityBar>:
 	canvas:
@@ -274,7 +292,7 @@ DarkBunnyGame:
 				on_press: app.root.set_state()
 			CamouflopButton:
 				text: 'Play Game'
-				on_press: app.root.start_game()
+				on_press: app.root.start_game_editor()
 			CamouflopButton:
 				text: 'Clouds'
 				on_press: root.open_entity_list('place_clouds')

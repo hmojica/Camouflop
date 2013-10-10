@@ -236,7 +236,7 @@ class RabbitSystem(GameSystem):
         camera_pos = self.gameworld.systems['default_gameview'].camera_pos
         touch.x -= camera_pos[0]
         touch.y -= camera_pos[1]
-        if self.gameworld.state == 'main':
+        if self.gameworld.state == 'main' or 'main_editor':
             called_rabbit = self.touch_rabbit(touch)
             if not called_rabbit is None:
                 if called_rabbit == self.rabbit:

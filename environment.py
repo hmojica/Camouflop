@@ -96,6 +96,7 @@ class EnvironmentSystem(GameSystem):
         force_offset = unit_vector[0] * -1 * 100, unit_vector[1] * -1 * 100
         force = 1000 * unit_vector[0], 1000 * unit_vector[1]
         physics_body.apply_force(force, force_offset)
+        return cloud_id
 
     def add_tree(self, position, type):
         x = position[0]
@@ -119,6 +120,7 @@ class EnvironmentSystem(GameSystem):
         entity_id = self.gameworld.init_entity(create_component_dict, component_order)
         type = type + '_shadow'
         self.add_tree_shadow(position, type, entity_id)
+        return entity_id
 
     def add_rock(self, position, type='large_rock'):
         x = position[0]
@@ -134,7 +136,8 @@ class EnvironmentSystem(GameSystem):
         create_component_dict = {'cymunk-physics': physics_component_dict,
                                  'physics_renderer': renderer, 'environment_system': {}}
         component_order = ['cymunk-physics', 'environment_system', 'physics_renderer']
-        self.gameworld.init_entity(create_component_dict, component_order)
+        entity_id = self.gameworld.init_entity(create_component_dict, component_order)
+        return entity_id
 
     def load_snowtexture(self, type, position):
         create_component_dict = {'position': {'position': position},
@@ -181,7 +184,8 @@ class EnvironmentSystem(GameSystem):
                                  'physics_renderer': renderer,
                                  'environment_system': {},}
         component_order = ['cymunk-physics', 'environment_system', 'physics_renderer']
-        self.gameworld.init_entity(create_component_dict, component_order)
+        entity_id = self.gameworld.init_entity(create_component_dict, component_order)
+        return entity_id
 
     def clear_objects(self):
         for entity_id in self.entity_ids:

@@ -157,6 +157,17 @@ class DarkBunnyGame(Widget):
             'tree_physics_renderer', 'hawk_physics_renderer', 
             'shadow_renderer',],
             screenmanager_screen='editor')
+        self.gameworld.add_state(state_name='main_editor', systems_added=[
+            'physics_renderer2', 
+            'rabbit_system', 'physics_renderer', 'shadow_renderer',
+            'tree_physics_renderer', 'hawk_physics_renderer',],
+            systems_removed=[],
+            systems_paused=[], systems_unpaused=['cymunk-physics', 
+            'physics_renderer2', 'physics_renderer', 
+            'tree_physics_renderer', 'hawk_physics_renderer',
+            'animation_system', 'shadow_renderer', 'hawk_ai_system', 
+            'rabbit_system', 'default_gameview'],
+            screenmanager_screen='main_editor')
 
     def no_impact_collision(self, space, arbiter):
         return False
@@ -166,15 +177,19 @@ class DarkBunnyGame(Widget):
         systems = self.gameworld.systems
         gameview = systems['default_gameview']
         gameview.focus_entity = True
+
+    def start_game_editor(self):
+        self.gameworld.state = 'main_editor'
+        systems = self.gameworld.systems
+        gameview = systems['default_gameview']
+        gameview.focus_entity = True
         
     def pause_game(self):
         self.gameworld.state = 'pause'
 
     def open_editor(self):
         systems = self.gameworld.systems
-        levels_system = systems['levels_system']
         self.gameworld.state = 'editor'
-        levels_system.clear_gameworld_objects()
         gameview = systems['default_gameview']
         gameview.focus_entity = False
 
@@ -249,7 +264,6 @@ class DarkBunnyGame(Widget):
         levels_system = systems['levels_system']
         levels_system.current_level_id = 0
         self.setup_collision_callbacks()
-        #self.gameworld.music_controller.play_new_song(30)
 
     def generate_level(self):
         systems = self.gameworld.systems
