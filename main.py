@@ -285,9 +285,13 @@ class DebugPanel(Widget):
 class DarkApp(App):
     music_level = NumericProperty(1.)
     sound_level = NumericProperty(1.)
+    
 
     def build(self):
-        pass
+        self.variable = NumericProperty(10)
+
+    def on_start(self):
+        print self.variable
 
 if __name__== '__main__':
 

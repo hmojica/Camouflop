@@ -278,48 +278,107 @@ DarkBunnyGame:
 
 <Editor>:
 	root_layout: root_layout
+	app: app
 	FloatLayout:
 		id: root_layout
 		size: root.size
 		pos: root.pos
-		BoxLayout:
-			size_hint: (.25, .5)
-			padding: 5
-			spacing: 5
-			orientation: 'vertical'
-			CamouflopButton:
-				text: 'Main Menu'
-				on_press: app.root.set_state()
-			CamouflopButton:
-				text: 'Play Game'
-				on_press: app.root.start_game_editor()
-			CamouflopButton:
-				text: 'Clouds'
-				on_press: root.open_entity_list('place_clouds')
-			CamouflopButton:
-				text: 'Trees'
-				on_press: root.open_entity_list('place_tree')
-			CamouflopButton:
-				text: 'Rocks'
-				on_press: root.open_entity_list('place_rock')
-			CamouflopButton:
-				text: 'Rabbits'
-				on_press: root.open_entity_list('place_rabbit')
-			CamouflopButton:
-				text: 'Holes'
-				on_press: root.open_entity_list('place_hole')
-			CamouflopButton:
-				text: 'Delete'
-				on_press: root.edit_mode = 'delete'
-			CamouflopButton:
-				text: 'Move'
-				on_press: root.edit_mode = 'move'
-			CamouflopButton:
-				text: 'Free Look'
-				on_press: root.edit_mode = 'freelook'
-			CamouflopButton:
-				text: 'Map Size'
-				on_press: root.open_map_size_picker()
+		EditorToggleModePanel:
+			editor: root
+			size_hint: (.20, .1)
+			pos_hint: {'x': .8, 'y': .9}
+		CamouflopToggleButton:
+			text: 'S'
+			size_hint: (.1, .1)
+			pos_hint: {'x': 0., 'y':.9}
+			allow_toggle: True
+			on_press: root.toggle_editor_menu()
+		
+
+<EditorMenu>:
+	BoxLayout:
+		size: root.size
+		pos: root.pos
+		padding: 5
+		spacing: 5
+		orientation: 'vertical'
+		CamouflopButton:
+			text: 'Main Menu'
+			on_press: app.root.set_state()
+		CamouflopButton:
+			text: 'Play Game'
+			on_press: root.editor.check_valid_map()
+		CamouflopButton:
+			text: 'Map Size'
+			on_press: root.editor.open_map_size_picker()
+
+
+<-SelectEntityButton>:
+	Image:
+		source: root.texture_source
+		keep_ratio: True
+		mipmap: True
+		size: root.size
+		pos: root.pos
+
+<EditorEntitiesPanel>:
+	BoxLayout:
+		size: root.size
+		pos: root.pos
+		padding: 5
+		spacing: 5
+		orientation: 'vertical'
+		CamouflopToggleButton:
+			group: 'entity_lists'
+			allow_toggle: True
+			text: 'Clouds'
+			on_press: root.editor.open_entity_list('place_clouds')
+		CamouflopToggleButton:
+			group: 'entity_lists'
+			allow_toggle: True
+			text: 'Trees'
+			on_press: root.editor.open_entity_list('place_tree')
+		CamouflopToggleButton:
+			group: 'entity_lists'
+			allow_toggle: True
+			text: 'Rocks'
+			on_press: root.editor.open_entity_list('place_rock')
+		CamouflopToggleButton:
+			group: 'entity_lists'
+			allow_toggle: True
+			text: 'Rabbits'
+			on_press: root.editor.open_entity_list('place_rabbit')
+		CamouflopToggleButton:
+			group: 'entity_lists'
+			allow_toggle: True
+			text: 'Holes'
+			on_press: root.editor.open_entity_list('place_hole')
+
+<EditorToggleModePanel>:
+	BoxLayout:
+		padding: 10.
+		spacing: 5.
+		size: root.size
+		pos: root.pos
+		orientation: 'horizontal'
+		CamouflopToggleButton:
+			text: '(o)'
+			group: 'toggle_panel'
+			on_press: root.editor.edit_mode = 'freelook'
+		CamouflopToggleButton:
+			text: 'P'
+			group: 'toggle_panel'
+			on_press: root.editor.edit_mode = 'place'
+		CamouflopToggleButton:
+			text: '+'
+			group: 'toggle_panel'
+			on_press: root.editor.edit_mode = 'move'
+		CamouflopToggleButton:
+			text: 'X'
+			group: 'toggle_panel'
+			on_press: root.editor.edit_mode = 'delete'
+
+
 
 <SliderSetting@Widget>:
 	slider_name: self.slider_name
@@ -375,6 +434,28 @@ DarkBunnyGame:
 			text: 'Return to Main Menu'
 			on_press: app.root.set_state()
 
+<CamouflopToggleButton>:
+	font_name: 'assets/ui_elements/TEMPSITC.TTF'
+	font_size: 40
+	canvas:
+		Color:
+			rgba: (1., 1. ,1., 1.) if root.state == 'normal' else (0., 0., 0., 1.)
+		Rectangle:
+			size: root.size
+			pos: root.pos
+		Color:
+			rgba: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		Line:
+			rectangle: (self.pos[0], self.pos[1], self.size[0], self.size[1])
+			width: 2.0
+
+	Label:
+		text: root.text
+		font_size: root.font_size
+		font_name: root.font_name
+		color: (0., 0., 0., 1.) if root.state == 'normal' else (1., 1., 1., 1.)
+		size: root.size
+		pos: root.pos
 
 <-CamouflopButton@Button>:
 	font_name: 'assets/ui_elements/TEMPSITC.TTF'

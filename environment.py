@@ -15,14 +15,11 @@ class EnvironmentSystem(GameSystem):
         'small_rock': ('assets/environment/rockSM.png',34,33),
         'med_rock': ('assets/environment/rockMD.png',58,56),
         'large_rock': ('assets/environment/rockLG.png',70,70),
-        'snow_bank_a': ('assets/environment/SnowBankA.png',160,200),
-        'snow_bank_b': ('assets/environment/SnowBankB.png',160,100),
-        'snow_crack_a': ('assets/environment/SnowCrackA.png',160,100),
-        'snow_crack_b': ('assets/environment/SnowCrackB.png',126,76),
-        'snow_drift_a': ('assets/environment/SnowDriftA.png',184,112),
-        'snow_drift_b': ('assets/environment/SnowDriftB.png',160,100),
-        'snow_hill_a': ('assets/environment/SnowHillA.png',160,100),
-        'snow_hill_b': ('assets/environment/SnowHillB.png',160,100)
+        'small_feather': ('assets/environment/CloudSMfeather1.png', 196, 87),
+        'large_feather': ('assets/environment/CloudLGfeather1.png', 389, 171),
+        'hole1': ('assets/environment/RabbitHole.png', 95, 95),
+        'dark_bunny': ('assets/black_rabbit/BR1.png', 75, 82),
+        'white_rabbit': ('assets/white_rabbit/WR1.png', 53, 57),
     }
 
     def create_component(self, entity_id, entity_component_dict):
